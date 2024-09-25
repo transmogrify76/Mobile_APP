@@ -8,19 +8,23 @@ const api = axios.create({
   baseURL: API_URL,
 });
 
-export const signupUser = async (username: string, email: string, password: string) => {
+// Function for user signup and OTP verification
+export const signupUser = async (username: string, email: string, password: string, otp?: string) => {
   try {
-    const response = await api.post('/signup', {
-      username,
-      email,
-      password,
-    },
-    {
-    headers: {
-        apiauthkey: 'aBcD1eFgH2iJkLmNoPqRsTuVwXyZ012345678jasldjalsdjurewouroewiru'
+    const payload: any = { username, email, password };
+
+    // If OTP is provided, include it in the payload
+    if (otp) {
+      payload.otp = otp;
+      delete payload.username; // Remove username if OTP is being verified
     }
-}
-);
+
+    const response = await api.post('/signup', payload, {
+      headers: {
+        apiauthkey: 'aBcD1eFgH2iJkLmNoPqRsTuVwXyZ012345678jasldjalsdjurewouroewiru'
+      }
+    });
+
     return response.data;
   } catch (error: unknown) {
     // Check if error is an Axios error
