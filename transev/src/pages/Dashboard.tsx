@@ -2,12 +2,18 @@ import React, { useState } from 'react';
 import { FaSearch, FaFilter, FaMapMarkerAlt, FaWallet, FaUser, FaQrcode, FaBars } from 'react-icons/fa';
 import { IonPage, IonHeader, IonToolbar, IonContent } from '@ionic/react';
 import Sidebar from './Sidebar';
+import QRScannerComponent from './QRScanner'; // Import the QRScannerComponent
 
 const Dashboard: React.FC = () => {
     const [isSidebarOpen, setSidebarOpen] = useState(false);
-  
+    const [isScannerOpen, setScannerOpen] = useState(false); // State to control scanner visibility
+
     const toggleSidebar = () => {
-      setSidebarOpen(!isSidebarOpen);
+        setSidebarOpen(!isSidebarOpen);
+    };
+
+    const toggleScanner = () => {
+        setScannerOpen(!isScannerOpen);
     };
 
     return (
@@ -24,13 +30,13 @@ const Dashboard: React.FC = () => {
             <IonHeader className="bg-white shadow-md">
                 <IonToolbar>
                     <div className="flex items-center justify-between px-4 py-2">
-                        {/* Hamburger Menu Icon with padding */}
-                        <div className="cursor-pointer pr-4" onClick={toggleSidebar}> {/* Added right padding */}
+                        {/* Hamburger Menu Icon */}
+                        <div className="cursor-pointer" onClick={toggleSidebar}>
                             <FaBars className="text-gray-600 text-xl" />
                         </div>
 
                         {/* Search Bar with Icon */}
-                        <div className="flex items-center bg-gray-100 rounded-full px-4 py-2 w-full" style={{ maxWidth: '300px' }}>
+                        <div className="flex items-center bg-gray-100 rounded-full px-4 py-2 w-full max-w-md">
                             <FaSearch className="text-gray-500 text-lg mr-2" />
                             <input
                                 type="text"
@@ -39,8 +45,8 @@ const Dashboard: React.FC = () => {
                             />
                         </div>
 
-                        {/* Filter Icon */}
-                        <div className="ml-4 bg-gray-200 rounded-full shadow-lg p-2 cursor-pointer hover:bg-gray-300 transition">
+                        {/* Filter Icon with Added Padding */}
+                        <div className="ml-4 bg-gray-200 rounded-full shadow-lg p-3 cursor-pointer hover:bg-gray-300 transition"> {/* Increased padding here */}
                             <FaFilter className="text-gray-600" />
                         </div>
                     </div>
@@ -74,7 +80,7 @@ const Dashboard: React.FC = () => {
                         <p className="text-gray-600 text-sm">Timings: Open 24/7</p>
                         <p className="text-gray-600 text-sm">Rate: ₹1 fixed, ₹5/kWh</p>
                     </div>
-                    <div className="ml-auto bg-white text-green-500 rounded-full border border-green-500 shadow-md p-2 flex items-center justify-center cursor-pointer hover:bg-green-100 transition">
+                    <div className="ml-auto bg-white text-green-500 rounded-full border border-green-500 shadow-md p-2 flex items-center justify-center cursor-pointer hover:bg-green-100 transition" onClick={toggleScanner}>
                         <FaMapMarkerAlt className="text-xl" />
                     </div>
                 </div>
@@ -86,7 +92,7 @@ const Dashboard: React.FC = () => {
                     <FaMapMarkerAlt className="text-2xl" style={{ color: '#2E8B57' }} />
                     <p className="text-xs">Map</p>
                 </div>
-                <div className="flex flex-col items-center p-1 cursor-pointer hover:bg-gray-100 transition">
+                <div className="flex flex-col items-center p-1 cursor-pointer hover:bg-gray-100 transition" onClick={toggleScanner}>
                     <FaQrcode className="text-2xl" style={{ color: '#2E8B57' }} />
                     <p className="text-xs">Scan</p>
                 </div>
@@ -99,6 +105,9 @@ const Dashboard: React.FC = () => {
                     <p className="text-xs">Profile</p>
                 </div>
             </div>
+
+            {/* QR Scanner Popup */}
+            {isScannerOpen && <QRScannerComponent onClose={toggleScanner} />}
         </IonPage>
     );
 };
