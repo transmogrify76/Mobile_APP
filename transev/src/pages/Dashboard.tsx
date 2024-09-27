@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { FaSearch, FaFilter, FaMapMarkerAlt, FaWallet, FaUser, FaQrcode, FaBars } from 'react-icons/fa';
 import { IonPage, IonHeader, IonToolbar, IonContent } from '@ionic/react';
 import Sidebar from './Sidebar';
-import QRScannerComponent from './QRScanner'; // Import the QRScannerComponent
+import QRScannerComponent from './QRScanner'; 
 
 const Dashboard: React.FC = () => {
     const [isSidebarOpen, setSidebarOpen] = useState(false);
-    const [isScannerOpen, setScannerOpen] = useState(false); // State to control scanner visibility
+    const [isScannerOpen, setScannerOpen] = useState(false); 
 
     const toggleSidebar = () => {
         setSidebarOpen(!isSidebarOpen);

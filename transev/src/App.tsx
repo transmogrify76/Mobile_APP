@@ -9,7 +9,7 @@ import Signup from './pages/Signup';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import HomePage from './pages/HomePage';
-
+import Wallet from './pages/Wallet';
 
 const App: React.FC = () => (
   <IonApp>
@@ -22,7 +22,7 @@ const App: React.FC = () => (
         <Route path="/signup" component={Signup} exact={true} />
         <Route path="/login" component={Login} exact={true} />
         <Route path="/dashboard" component={Dashboard} exact={true} />
-        
+        <Route path="/wallet" component={Wallet} exact={true} />
       </IonRouterOutlet>
     </IonReactRouter>
   </IonApp>
