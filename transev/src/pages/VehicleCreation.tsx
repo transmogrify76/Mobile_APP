@@ -19,12 +19,14 @@ const VehicleCreation: React.FC = () => {
 
     try {
       const apiKey = "aBcD1eFgH2iJkLmNoPqRsTuVwXyZ012345678jasldjalsdjurewouroewiru";
-         
+      const adminuid = "yyyy"; // Hardcoded adminuid
+      
       if (!apiKey) {
         alert('API key is not defined. Please check your environment variables.');
         return;
       }
 
+      // Make the POST request to the backend
       const response = await axios.post('http://localhost:3000/admin/createav', {
         vehiclename: vehicleName,
         vehiclemodel: vehicleModel,
@@ -32,6 +34,7 @@ const VehicleCreation: React.FC = () => {
         vehicleowner: vehicleOwner,
         vehicletype: vehicleType,
         vehiclecategory: vehicleCategory,
+        adminuid: adminuid, // Pass hardcoded adminuid
       }, {
         headers: {
           'Content-Type': 'application/json',
@@ -52,7 +55,6 @@ const VehicleCreation: React.FC = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-teal-100 via-teal-200 to-blue-100">
       <div className="w-full h-screen flex items-center justify-center">
-        {/* Form Container */}
         <div className="w-full max-w-md h-[100vh] bg-white bg-opacity-60 backdrop-blur-xl rounded-3xl shadow-2xl p-8 flex flex-col justify-center overflow-hidden">
 
           {/* Logo */}
@@ -66,11 +68,8 @@ const VehicleCreation: React.FC = () => {
 
           <h2 className="text-4xl font-bold text-center text-teal-800 mb-6">Create Vehicle</h2>
 
-          {/* Scrollable Form Container */}
           <div className="overflow-y-auto h-full">
-            {/* Vehicle Creation Form */}
             <form onSubmit={handleSubmit} noValidate className="space-y-4">
-              {/* Vehicle Name Input */}
               <div>
                 <label className="block text-lg font-medium text-gray-700">Vehicle Name</label>
                 <input
@@ -83,7 +82,6 @@ const VehicleCreation: React.FC = () => {
                 />
               </div>
 
-              {/* Vehicle Model Input */}
               <div>
                 <label className="block text-lg font-medium text-gray-700">Vehicle Model</label>
                 <input
@@ -96,7 +94,6 @@ const VehicleCreation: React.FC = () => {
                 />
               </div>
 
-              {/* Vehicle License Input */}
               <div>
                 <label className="block text-lg font-medium text-gray-700">Vehicle License</label>
                 <input
@@ -109,7 +106,6 @@ const VehicleCreation: React.FC = () => {
                 />
               </div>
 
-              {/* Vehicle Owner Input */}
               <div>
                 <label className="block text-lg font-medium text-gray-700">Vehicle Owner</label>
                 <input
@@ -122,7 +118,6 @@ const VehicleCreation: React.FC = () => {
                 />
               </div>
 
-              {/* Vehicle Type Input */}
               <div>
                 <label className="block text-lg font-medium text-gray-700">Vehicle Type</label>
                 <input
@@ -135,7 +130,6 @@ const VehicleCreation: React.FC = () => {
                 />
               </div>
 
-              {/* Vehicle Category Input */}
               <div>
                 <label className="block text-lg font-medium text-gray-700">Vehicle Category</label>
                 <input
@@ -148,7 +142,6 @@ const VehicleCreation: React.FC = () => {
                 />
               </div>
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 className="w-full bg-teal-500 text-white font-bold py-3 rounded-full shadow-lg hover:bg-teal-600 transition duration-300 ease-in-out"
@@ -159,7 +152,6 @@ const VehicleCreation: React.FC = () => {
             </form>
           </div>
 
-          {/* Error and Success Messages */}
           {errorMessage && <p className="text-red-500 text-center mt-4">{errorMessage}</p>}
           {successMessage && <p className="text-green-500 text-center mt-4">{successMessage}</p>}
         </div>
