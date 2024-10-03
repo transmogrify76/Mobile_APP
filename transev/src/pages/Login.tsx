@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useHistory } from 'react-router-dom'; // Import useHistory
 
 const Login: React.FC = () => {
+    const history = useHistory(); // Initialize useHistory hook
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [otp, setOtp] = useState<string[]>(Array(6).fill('')); // 6 OTP inputs
@@ -27,7 +29,7 @@ const Login: React.FC = () => {
             } else if (response.status === 200) {
                 const { token } = response.data;
                 localStorage.setItem('token', token); // Save the JWT token
-                // Redirect to the user dashboard or home
+                history.push('/dashboard'); // Redirect to the user dashboard
             }
         } catch (error) {
             if (axios.isAxiosError(error)) {
@@ -68,7 +70,7 @@ const Login: React.FC = () => {
             if (response.status === 200) {
                 const { token } = response.data;
                 localStorage.setItem('token', token);
-                // Redirect to the user dashboard or home
+                history.push('/dashboard'); // Redirect to the user dashboard
             }
         } catch (error) {
             if (axios.isAxiosError(error)) {

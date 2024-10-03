@@ -1,5 +1,5 @@
 import React, { useState, useEffect, ReactNode } from 'react';
-import { FaSearch, FaFilter, FaMapMarkerAlt, FaWallet, FaUser, FaQrcode, FaBars } from 'react-icons/fa';
+import { FaSearch, FaFilter, FaHeart, FaWallet, FaUser, FaQrcode, FaBars, FaMapMarkerAlt } from 'react-icons/fa'; // Import FaHeart instead of FaMapMarkerAlt
 import Sidebar from './Sidebar';
 import QRScannerComponent from './QRScanner'; 
 
@@ -92,42 +92,41 @@ const Dashboard = () => {
 
             {/* Main Content */}
             <div className="px-4 py-2 bg-gray-50">
-    {/* Map/List View Toggle */}
-    <div className="flex justify-center my-4">
-        <div className="mx-2 bg-blue-600 text-white rounded-full px-6 py-1 shadow-md text-center cursor-pointer">List View</div>
-        <div className="mx-2 bg-gray-200 text-black rounded-full border border-gray-300 px-6 py-1 shadow-md text-center cursor-pointer">Map View</div>
-    </div>
-
-    {/* Loading State */}
-    {loading ? (
-        <p>Loading chargers...</p>
-    ) : (
-        <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}> {/* Set maxHeight as needed */}
-            {chargers.map((charger) => (
-                <div key={charger.id} className="flex items-center bg-white rounded-lg shadow-md p-4 mb-6">
-                    <img
-                        src={charger.image_url || 'default_image_placeholder.jpg'}  // Adjust the image URL based on the API response
-                        alt="Charger"
-                        className="w-16 h-16 rounded-lg object-cover mr-4 shadow"
-                    />
-                    <div className="flex flex-col flex-grow">
-                        <h3 className="text-lg font-semibold text-gray-800">{charger.chargeridentity}</h3>
-                        <p className={charger.available ? 'text-green-600 text-sm font-medium' : 'text-red-600 text-sm font-medium'}>
-                            {charger.available ? 'Available' : 'Not Available'}
-                        </p>
-                        <p className="text-gray-600 text-sm">Distance: ~{charger.distance} km</p>
-                        <p className="text-gray-600 text-sm">Timings: {charger.timings}</p>
-                        <p className="text-gray-600 text-sm">Rate: ₹{charger.rate_fixed} fixed, ₹{charger.rate_kwh}/kWh</p>
-                    </div>
-                    <div className="ml-auto bg-white text-green-500 rounded-full border border-green-500 shadow-md p-2 flex items-center justify-center cursor-pointer hover:bg-green-100 transition" onClick={toggleScanner}>
-                        <FaMapMarkerAlt className="text-xl" />
-                    </div>
+                {/* Map/List View Toggle */}
+                <div className="flex justify-center my-4">
+                    <div className="mx-2 bg-blue-600 text-white rounded-full px-6 py-1 shadow-md text-center cursor-pointer">List View</div>
+                    <div className="mx-2 bg-gray-200 text-black rounded-full border border-gray-300 px-6 py-1 shadow-md text-center cursor-pointer">Map View</div>
                 </div>
-            ))}
-        </div>
-    )}
-</div>
 
+                {/* Loading State */}
+                {loading ? (
+                    <p>Loading chargers...</p>
+                ) : (
+                    <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+                        {chargers.map((charger) => (
+                            <div key={charger.id} className="flex items-center bg-white rounded-lg shadow-md p-4 mb-6">
+                                <img
+                                    src={charger.image_url || 'default_image_placeholder.jpg'}
+                                    alt="Charger"
+                                    className="w-16 h-16 rounded-lg object-cover mr-4 shadow"
+                                />
+                                <div className="flex flex-col flex-grow">
+                                    <h3 className="text-lg font-semibold text-gray-800">{charger.chargeridentity}</h3>
+                                    <p className={charger.available ? 'text-green-600 text-sm font-medium' : 'text-red-600 text-sm font-medium'}>
+                                        {charger.available ? 'Available' : 'Not Available'}
+                                    </p>
+                                    <p className="text-gray-600 text-sm">Distance: ~{charger.distance} km</p>
+                                    <p className="text-gray-600 text-sm">Timings: {charger.timings}</p>
+                                    <p className="text-gray-600 text-sm">Rate: ₹{charger.rate_fixed} fixed, ₹{charger.rate_kwh}/kWh</p>
+                                </div>
+                                <div className="ml-auto bg-white text-red-500 rounded-full border border-red-500 shadow-md p-2 flex items-center justify-center cursor-pointer hover:bg-red-100 transition" onClick={() => toggleScanner()}>
+                                    <FaHeart className="text-xl" /> {/* Updated icon to FaHeart */}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
 
             {/* Bottom Navigation */}
             <div className="fixed bottom-0 w-full bg-white border-t border-gray-200 p-3 flex justify-around shadow-lg">
