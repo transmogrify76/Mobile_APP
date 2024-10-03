@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { FaSearch, FaFilter, FaMapMarkerAlt, FaWallet, FaUser, FaQrcode, FaBars } from 'react-icons/fa';
-import { IonPage, IonHeader, IonToolbar, IonContent } from '@ionic/react';
 import Sidebar from './Sidebar';
-import QRScannerComponent from './QRScanner'; 
+import QRScannerComponent from './QRScanner';
 
 const Dashboard: React.FC = () => {
     const [isSidebarOpen, setSidebarOpen] = useState(false);
-    const [isScannerOpen, setScannerOpen] = useState(false); 
+    const [isScannerOpen, setScannerOpen] = useState(false);
 
     const toggleSidebar = () => {
         setSidebarOpen(!isSidebarOpen);
@@ -17,7 +16,7 @@ const Dashboard: React.FC = () => {
     };
 
     return (
-        <IonPage>
+        <div className="h-screen flex flex-col">
             {/* Sidebar */}
             <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
@@ -27,43 +26,36 @@ const Dashboard: React.FC = () => {
             )}
 
             {/* Header */}
-            <IonHeader className="bg-white shadow-md">
-                <IonToolbar>
-                    <div className="flex items-center justify-between px-4 py-2">
-                        {/* Hamburger Menu Icon */}
-                        <div className="cursor-pointer" onClick={toggleSidebar}>
-                            <FaBars className="text-gray-600 text-xl" />
-                        </div>
-
-                        {/* Search Bar with Icon */}
-                        <div className="flex items-center bg-gray-100 rounded-full px-4 py-2 w-full max-w-md">
-                            <FaSearch className="text-gray-500 text-lg mr-2" />
-                            <input
-                                type="text"
-                                className="w-full bg-transparent focus:outline-none text-gray-700"
-                                placeholder="Search EV Chargers nearby..."
-                            />
-                        </div>
-
-                        {/* Filter Icon with Added Padding */}
-                        <div className="ml-4 bg-gray-200 rounded-full shadow-lg p-3 cursor-pointer hover:bg-gray-300 transition"> {/* Increased padding here */}
-                            <FaFilter className="text-gray-600" />
-                        </div>
+            <header className="bg-white shadow-md">
+                <div className="flex items-center justify-between px-4 py-2">
+                    {/* Hamburger Menu Icon */}
+                    <div className="cursor-pointer" onClick={toggleSidebar}>
+                        <FaBars className="text-gray-600 text-xl" />
                     </div>
-                </IonToolbar>
-            </IonHeader>
+
+                    {/* Search Bar with Icon */}
+                    <div className="flex items-center bg-gray-100 rounded-full px-4 py-2 w-full max-w-md">
+                        <FaSearch className="text-gray-500 text-lg mr-2" />
+                        <input
+                            type="text"
+                            className="w-full bg-transparent focus:outline-none text-gray-700"
+                            placeholder="Search EV Chargers nearby..."
+                        />
+                    </div>
+
+                    {/* Filter Icon */}
+                    <div className="ml-4 bg-gray-200 rounded-full shadow-lg p-3 cursor-pointer hover:bg-gray-300 transition">
+                        <FaFilter className="text-gray-600" />
+                    </div>
+                </div>
+            </header>
 
             {/* Main Content */}
-            <IonContent className="px-4 py-2 bg-gray-50">
+            <div className="flex-grow overflow-y-auto px-4 py-2 bg-gray-50">
                 {/* Toggle Buttons for Map/List View */}
                 <div className="flex justify-center my-4">
                     <div className="mx-2 bg-blue-600 text-white rounded-full px-6 py-1 shadow-md text-center cursor-pointer">Map View</div>
                     <div className="mx-2 bg-gray-200 text-black rounded-full border border-gray-300 px-6 py-1 shadow-md text-center cursor-pointer">List View</div>
-                </div>
-
-                {/* Map Placeholder */}
-                <div className="h-72 bg-gray-300 rounded-lg shadow-lg mb-4 flex items-center justify-center">
-                    <p className="text-center text-gray-500">Map Placeholder</p>
                 </div>
 
                 {/* Charger Info Card */}
@@ -84,10 +76,10 @@ const Dashboard: React.FC = () => {
                         <FaMapMarkerAlt className="text-xl" />
                     </div>
                 </div>
-            </IonContent>
+            </div>
 
             {/* Bottom Navigation */}
-            <div className="fixed bottom-0 w-full bg-white border-t border-gray-200 p-3 flex justify-around shadow-lg">
+            <footer className="fixed bottom-0 w-full bg-white border-t border-gray-200 p-3 flex justify-around shadow-lg">
                 <div className="flex flex-col items-center p-1 cursor-pointer hover:bg-gray-100 transition">
                     <FaMapMarkerAlt className="text-2xl" style={{ color: '#2E8B57' }} />
                     <p className="text-xs">Map</p>
@@ -104,11 +96,11 @@ const Dashboard: React.FC = () => {
                     <FaUser className="text-2xl" style={{ color: '#2E8B57' }} />
                     <p className="text-xs">Profile</p>
                 </div>
-            </div>
+            </footer>
 
             {/* QR Scanner Popup */}
             {isScannerOpen && <QRScannerComponent onClose={toggleScanner} />}
-        </IonPage>
+        </div>
     );
 };
 
