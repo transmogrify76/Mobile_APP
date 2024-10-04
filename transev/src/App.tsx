@@ -10,6 +10,9 @@ import HomePage from './pages/HomePage';
 import Wallet from './pages/Wallet';
 import VehicleCreation from './pages/VehicleCreation';
 import UserProfile from './pages/UserProfile';
+import FavoriteChargers from './pages/FavoriteChargers';
+import MyBookings from './pages/MyBookings';
+
 
 const App: React.FC = () => (
   <IonApp>
@@ -25,6 +28,8 @@ const App: React.FC = () => (
         <Route path="/wallet" component={Wallet} exact={true} />
         <Route path="/add-vehicle" component={VehicleCreation} exact={true} />
         <Route path="/userprofile" component={UserProfile} exact={true} />
+        <Route path="/favourites" component={FavoriteChargers} exact={true} />
+        <Route path="/bookings" component={MyBookings} exact={true} />
 
 
       </IonRouterOutlet>
