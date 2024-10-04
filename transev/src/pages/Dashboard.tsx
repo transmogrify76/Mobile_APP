@@ -1,10 +1,12 @@
 import React, { useState, useEffect, ReactNode } from 'react';
-import { FaSearch, FaFilter, FaHeart, FaWallet, FaUser, FaQrcode, FaBars, FaMapMarkerAlt } from 'react-icons/fa'; // Import FaHeart instead of FaMapMarkerAlt
+import { FaSearch, FaFilter, FaHeart, FaWallet, FaUser, FaQrcode, FaBars, FaMapMarkerAlt } from 'react-icons/fa'; 
 import Sidebar from './Sidebar';
 import QRScannerComponent from './QRScanner'; 
+import {jwtDecode} from 'jwt-decode';  // Import jwt-decode to decode the token
 
 // Define the Charger interface
 interface Charger {
+    uid: any;
     chargeridentity: ReactNode;
     id: string; // or number depending on your API
     image_url?: string;
@@ -14,6 +16,7 @@ interface Charger {
     timings: string; // You can adjust the type as necessary
     rate_fixed: number;
     rate_kwh: number;
+    isFavorite?: boolean; // Add isFavorite field to track favorite status
 }
 
 const Dashboard = () => {
@@ -29,6 +32,23 @@ const Dashboard = () => {
     const toggleScanner = () => {
         setScannerOpen(!isScannerOpen);
     };
+
+    // Function to extract userid from token in localStorage
+    const getUserIdFromToken = (): string | null => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                const decodedToken: any = jwtDecode(token); // Decode the JWT token
+                return decodedToken.userid; // Extract userid from the decoded token
+            } catch (error) {
+                console.error('Error decoding token:', error);
+                return null;
+            }
+        }
+        return null;
+    };
+
+    const userid = getUserIdFromToken(); // Extract userid once from token
 
     // Fetch charger data from the API
     useEffect(() => {
@@ -54,6 +74,43 @@ const Dashboard = () => {
 
         fetchChargerData();
     }, []);
+
+    // Function to handle the favorite toggle
+    const handleFavoriteToggle = async (charger: Charger) => {
+        if (!userid) {
+            console.error('User ID not found in token');
+            return;
+        }
+
+        try {
+            const response = await fetch('http://localhost:3000/users/createfavorites', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    apiauthkey: 'aBcD1eFgH2iJkLmNoPqRsTuVwXyZ012345678jasldjalsdjurewouroewiru'
+                },
+                body: JSON.stringify({
+                    chargeruid: charger.uid, 
+                    useruid: userid, // Use the userid extracted from token
+                    isfavorite: !charger.isFavorite // Toggle the favorite status
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                // Update the UI after successful toggle
+                setChargers((prevChargers) => 
+                    prevChargers.map((ch) => 
+                        ch.id === charger.uid ? { ...ch, isFavorite: !ch.isFavorite } : ch
+                    )
+                );
+            } else {
+                console.error('Failed to update favorite status');
+            }
+        } catch (error) {
+            console.error('Error updating favorite status:', error);
+        }
+    };
 
     return (
         <div>
@@ -104,7 +161,7 @@ const Dashboard = () => {
                 ) : (
                     <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
                         {chargers.map((charger) => (
-                            <div key={charger.id} className="flex items-center bg-white rounded-lg shadow-md p-4 mb-6">
+                            <div key={charger.uid} className="flex items-center bg-white rounded-lg shadow-md p-4 mb-6">
                                 <img
                                     src={charger.image_url || 'default_image_placeholder.jpg'}
                                     alt="Charger"
@@ -119,8 +176,11 @@ const Dashboard = () => {
                                     <p className="text-gray-600 text-sm">Timings: {charger.timings}</p>
                                     <p className="text-gray-600 text-sm">Rate: ₹{charger.rate_fixed} fixed, ₹{charger.rate_kwh}/kWh</p>
                                 </div>
-                                <div className="ml-auto bg-white text-red-500 rounded-full border border-red-500 shadow-md p-2 flex items-center justify-center cursor-pointer hover:bg-red-100 transition" onClick={() => toggleScanner()}>
-                                    <FaHeart className="text-xl" /> {/* Updated icon to FaHeart */}
+                                <div
+                                    className={`ml-auto p-2 flex items-center justify-center cursor-pointer hover:bg-red-100 transition ${charger.isFavorite ? 'text-red-500' : 'text-gray-500'}`}
+                                    onClick={() => handleFavoriteToggle(charger)}
+                                >
+                                    <FaHeart className="text-xl" />
                                 </div>
                             </div>
                         ))}
@@ -148,7 +208,7 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* QR Scanner Popup */}
+            {/* QR Scanner */}
             {isScannerOpen && <QRScannerComponent onClose={toggleScanner} />}
         </div>
     );
