@@ -26,7 +26,7 @@ const MyBookings: React.FC = () => {
     const [isBooked, setIsBooked] = useState(false);
 
     const fetchBookings = async () => {
-        const apiUrl = 'http://localhost:3000/userauth/getlistofbookings'; // API URL for getting bookings
+        const apiUrl = 'https://evchargercmsbackend-ttnm.onrender.com/userauth/getlistofbookings'; // API URL for getting bookings
 
         // Get the token from local storage
         const token = localStorage.getItem('token');
@@ -64,7 +64,7 @@ const MyBookings: React.FC = () => {
     const handleCreateBooking = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const apiUrl = 'http://localhost:3000/userauth/chargerbookings'; // API URL for creating bookings
+        const apiUrl = 'https://evchargercmsbackend-ttnm.onrender.com/userauth/chargerbookings'; // API URL for creating bookings
 
         // Get the token from local storage
         const token = localStorage.getItem('token');
@@ -84,7 +84,7 @@ const MyBookings: React.FC = () => {
                 isbooked: isBooked.toString(), // Send as string
             }, {
                 headers: {
-                    'apiauthkey': process.env.REACT_APP_API_KEY // Your API Key
+                    'apiauthkey':"aBcD1eFgH2iJkLmNoPqRsTuVwXyZ012345678jasldjalsdjurewouroewiru"// Your API Key
                 }
             });
 

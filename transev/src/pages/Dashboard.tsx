@@ -54,7 +54,7 @@ const Dashboard = () => {
     useEffect(() => {
         const fetchChargerData = async () => {
             try {
-                const response = await fetch('http://localhost:3000/admin/listofcharges', {
+                const response = await fetch('https://evchargercmsbackend-ttnm.onrender.com/admin/listofcharges', {
                     headers: {
                         apiauthkey: 'aBcD1eFgH2iJkLmNoPqRsTuVwXyZ012345678jasldjalsdjurewouroewiru'
                     }
@@ -82,7 +82,7 @@ const Dashboard = () => {
         }
 
         try {
-            const response = await fetch('http://localhost:3000/users/createfavorites', {
+            const response = await fetch('https://evchargercmsbackend-ttnm.onrender.com/users/createfavorites', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

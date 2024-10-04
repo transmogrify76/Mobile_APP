@@ -12,7 +12,7 @@ const Login: React.FC = () => {
 
     const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const apiUrl = 'http://localhost:3000/userauth/login'; // Replace with your API URL
+        const apiUrl = 'https://evchargercmsbackend-ttnm.onrender.com/userauth/login'; // Replace with your API URL
         const payload = { email, password, otp: isOtpSent ? otp.join('') : undefined }; // Join OTP digits
 
         try {
@@ -55,7 +55,7 @@ const Login: React.FC = () => {
     };
 
     const handleOtpVerification = async () => {
-        const apiUrl = 'http://localhost:3000/userauth/login'; // Use the same endpoint
+        const apiUrl = 'https://evchargercmsbackend-ttnm.onrender.com/userauth/login'; // Use the same endpoint
         const payload = { email, password, otp: otp.join('') }; // Join OTP digits
 
         try {

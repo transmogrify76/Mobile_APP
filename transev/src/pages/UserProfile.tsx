@@ -36,7 +36,7 @@ const UserProfile: React.FC = () => {
         const userid = JSON.parse(atob(token.split('.')[1])).userid; // Assuming userid is in the payload of the token
 
         const response = await axios.post(
-          'http://localhost:3000/users/puprofile',
+          'https://evchargercmsbackend-ttnm.onrender.com/users/puprofile',
           { userid: userid },
           {
             headers: {
@@ -126,7 +126,7 @@ const UserProfile: React.FC = () => {
   
     try {
       console.log('Submitting form data:', payload); // Log form data
-      const response = await axios.post('http://localhost:3000/users/updateprofile', JSON.stringify(payload), {
+      const response = await axios.post('https://evchargercmsbackend-ttnm.onrender.com/users/updateprofile', JSON.stringify(payload), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json', // Set content type to application/json

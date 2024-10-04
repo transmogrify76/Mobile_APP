@@ -2,7 +2,7 @@
 
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3000/userauth'; 
+const API_URL = 'https://evchargercmsbackend-ttnm.onrender.com/userauth'; 
 
 const api = axios.create({
   baseURL: API_URL,
