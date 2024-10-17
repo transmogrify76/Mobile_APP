@@ -27,7 +27,7 @@ const VehicleCreation: React.FC = () => {
       }
 
       // Make the POST request to the backend
-      const response = await axios.post('https://evchargercmsbackend-ttnm.onrender.com/admin/createav', {
+      const response = await axios.post('https://transmogrify.in/admin/createav', {
         vehiclename: vehicleName,
         vehiclemodel: vehicleModel,
         vehiclelicense: vehicleLicense,

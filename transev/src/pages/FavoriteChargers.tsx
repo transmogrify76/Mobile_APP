@@ -47,7 +47,7 @@ const FavoriteChargers: React.FC = () => {
 
             try {
                 const response = await axios.post(
-                    'https://evchargercmsbackend-ttnm.onrender.com/users/loffchargers',
+                    'https://transmogrify.in/users/loffchargers',
                     { userid: userId },
                     {
                         headers: {
