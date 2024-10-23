@@ -21,7 +21,7 @@ const QRScannerComponent: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
   const handleStartCharger = async () => {
     setLoading(true); // Set loading to true while making the API call
-    const url = "https://transmogrify.in/users/startcharge";
+    const url = "https://transev.site/users/startcharge";
 
     try {
       const response = await fetch(url, {
