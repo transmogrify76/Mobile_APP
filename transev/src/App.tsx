@@ -24,7 +24,7 @@ const App: React.FC = () => (
       <Menu />
       <IonRouterOutlet>
 
-        <Route path="" component={Signup} exact={true} />
+        <Route path="" component={Login} exact={true} />
         <Route path="/home" component={HomePage} exact={true} />
         <Route path="/signup" component={Signup} exact={true} />
         <Route path="/login" component={Login} exact={true} />
