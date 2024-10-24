@@ -52,7 +52,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
       </div>
       <div className="space-y-4">
         <button className="flex items-center bg-blue-500 px-4 py-2 rounded-md w-full" onClick={handleCall}>
-          <IonIcon icon={call} className="mr-3" /> Call Us
+          <IonIcon icon={call} className="mr-3" /> Help & Support
         </button>
         <button className="flex items-center bg-gray-600 px-4 py-2 rounded-md w-full" onClick={toggleSidebar}>
           <IonIcon icon={logOut} className="mr-3" /> Log Out

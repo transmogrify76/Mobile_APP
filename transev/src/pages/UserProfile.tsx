@@ -25,56 +25,59 @@ const UserProfile: React.FC = () => {
 
   useEffect(() => {
     const fetchProfileDetails = async () => {
-      setLoading(true);
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          setErrorMessage('User is not logged in or token is missing.');
-          return;
-        }
+  setLoading(true);
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setErrorMessage('User is not logged in or token is missing.');
+      return;
+    }
 
-        const userid = JSON.parse(atob(token.split('.')[1])).userid; // Assuming userid is in the payload of the token
+    const userid = JSON.parse(atob(token.split('.')[1])).userid; // Assuming userid is in the payload of the token
 
-        const response = await axios.post(
-          'https://transev.site/users/puprofile',
-          { userid: userid },
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'apiauthkey': 'aBcD1eFgH2iJkLmNoPqRsTuVwXyZ012345678jasldjalsdjurewouroewiru',
-            },
-          }
-        );
-
-        if (response.data && response.data.data) {
-          const { username, phonenumber, email, profilepicture } = response.data.data;
-          setUserData({
-            name: username || '', // Map username to name
-            email: email || '',
-            phone: phonenumber || null, // Map phonenumber to phone
-            profilePicture: profilepicture || null, // Map profile picture
-          });
-          setFormData({
-            name: username || '',
-            email: email || '',
-            phone: phonenumber || null,
-            profilePicture: profilepicture || null,
-          });
-          setSuccessMessage('Profile details fetched successfully!');
-        } else {
-          throw new Error('Invalid response structure.');
-        }
-      } catch (error: unknown) {
-        console.error('Error fetching profile:', error);
-        if (error instanceof Error) {
-          setErrorMessage('Error fetching profile details. ' + error.message);
-        } else {
-          setErrorMessage('Error fetching profile details.');
-        }
-      } finally {
-        setLoading(false);
+    const response = await axios.post(
+      'https://transev.site/users/puprofile',
+      { userid: userid },
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'apiauthkey': 'aBcD1eFgH2iJkLmNoPqRsTuVwXyZ012345678jasldjalsdjurewouroewiru',
+        },
       }
-    };
+    );
+
+    if (response.data && response.data.data) {
+      const { username, phonenumber, email, profilepicture } = response.data.data;
+      const { pfimage } = response.data; // Get pfimage from the response
+
+      setUserData({
+        name: username || '', // Map username to name
+        email: email || '',
+        phone: phonenumber || null, // Map phonenumber to phone
+        profilePicture: pfimage || null, // Map pfimage to profile picture
+      });
+      setFormData({
+        name: username || '',
+        email: email || '',
+        phone: phonenumber || null,
+        profilePicture: pfimage || null, // Map pfimage to form data
+      });
+      setSuccessMessage('Profile details fetched successfully!');
+    } else {
+      throw new Error('Invalid response structure.');
+    }
+  } catch (error: unknown) {
+    console.error('Error fetching profile:', error);
+    if (error instanceof Error) {
+      setErrorMessage('Error fetching profile details. ' + error.message);
+    } else {
+      setErrorMessage('Error fetching profile details.');
+    }
+  } finally {
+    setLoading(false);
+  }
+};
+
 
     fetchProfileDetails();
   }, []);

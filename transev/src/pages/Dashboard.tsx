@@ -86,7 +86,7 @@ const Dashboard = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    apiauthkey: 'aBcD1eFgH2iJkLmNoPqRsTuVwXyZ012345678jasldjalsdjurewouro'
+                    apiauthkey: 'aBcD1eFgH2iJkLmNoPqRsTuVwXyZ012345678jasldjalsdjurewouroewiru'
                 },
                 body: JSON.stringify({
                     chargeruid: charger.uid, 
