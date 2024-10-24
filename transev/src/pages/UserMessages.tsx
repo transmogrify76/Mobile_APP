@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Storage } from '@capacitor/storage';
 import {jwtDecode} from 'jwt-decode';
-
+import { useHistory } from 'react-router-dom';
 interface DecodedToken {
   email: string;
 }
@@ -12,6 +12,11 @@ const UserMessages: React.FC = () => {
   const [messages, setMessages] = useState<any[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
+const history = useHistory();
+const handleNavigation = (path: string) => {
+    history.push(path);
+   
+};
 
   useEffect(() => {
     const fetchUserEmail = async () => {
@@ -88,7 +93,7 @@ const UserMessages: React.FC = () => {
         {/* Raise a Dispute Button */}
         <div className="mt-6">
           <button 
-            onClick={handleRaiseDispute} 
+            onClick={() => handleNavigation('/dispute')}
             className="w-full bg-teal-600 text-white font-bold py-2 px-4 rounded hover:bg-teal-700 transition duration-200"
           >
             Raise a Dispute

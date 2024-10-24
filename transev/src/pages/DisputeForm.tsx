@@ -1,37 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
+import { Storage } from '@capacitor/storage';
+import { jwtDecode } from 'jwt-decode';
 
 const DisputeForm: React.FC = () => {
   const history = useHistory();
   const [customerName, setCustomerName] = useState<string>('');
-  const [relatedToEv, setRelatedToEv] = useState<string>('');
-  const [reason, setReason] = useState<string>('');
-  const [moreThanOneCharge, setMoreThanOneCharge] = useState<boolean>(false);
-  const [wrongCharged, setWrongCharged] = useState<boolean>(false);
-  const [didNotReceiveRefund, setDidNotReceiveRefund] = useState<boolean>(false);
-  const [paidForOtherMeans, setPaidForOtherMeans] = useState<boolean>(false);
-  const [disputeTransaction, setDisputeTransaction] = useState<string>('');
-  const [chargedRegularly, setChargedRegularly] = useState<boolean>(false);
-  const [notListedAbove, setNotListedAbove] = useState<boolean>(false);
+  const [relatedToEv, setRelatedToEv] = useState<string>(''); 
+  const [moreThanOneCharge, setMoreThanOneCharge] = useState<string>(''); 
+  const [wrongCharged, setWrongCharged] = useState<string>(''); 
+  const [didNotReceiveRefund, setDidNotReceiveRefund] = useState<string>(''); 
+  const [paidForOtherMeans, setPaidForOtherMeans] = useState<string>(''); 
+  const [disputeTransaction, setDisputeTransaction] = useState<string>(''); 
+  const [chargedRegularly, setChargedRegularly] = useState<string>(''); 
+  const [notListedAbove, setNotListedAbove] = useState<string>(''); 
   const [transactionDetails, setTransactionDetails] = useState<string>('');
   const [disputeDetails, setDisputeDetails] = useState<string>('');
-  const [associatedAdminId, setAssociatedAdminId] = useState<string>('');
-  const [userId, setUserId] = useState<string>('');
+  const [userid, setuserid] = useState<string>(''); 
   
   const [successMessage, setSuccessMessage] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
+
+  useEffect(() => {
+    const fetchuserid = async () => {
+      const { value } = await Storage.get({ key: 'token' });
+      if (value) {
+        try {
+          const decodedToken: any = jwtDecode(value);
+          setuserid(decodedToken.userid || '');
+        } catch (error) {
+          console.error('Error decoding token:', error);
+        }
+      }
+    };
+
+    fetchuserid();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSuccessMessage('');
     setErrorMessage('');
-
+  
     try {
       const response = await axios.post('https://transev.site/admin/dspf', {
         customername: customerName,
         relatedtoev: relatedToEv,
-        reason,
         morethanonecharge: moreThanOneCharge,
         wrongcharged: wrongCharged,
         didnotreceiverefund: didNotReceiveRefund,
@@ -41,30 +56,30 @@ const DisputeForm: React.FC = () => {
         notlistedabove: notListedAbove,
         transactiondetails: transactionDetails,
         disputedetails: disputeDetails,
-        associatedadminid: associatedAdminId,
-        userid: userId,
+        associatedadminid: "yyyy",
+        userid: userid,
       }, {
         headers: {
           'apiauthkey': "aBcD1eFgH2iJkLmNoPqRsTuVwXyZ012345678jasldjalsdjurewouroewiru",
         },
       });
-
+  
       setSuccessMessage(response.data.message);
-      // Clear form fields
+      alert('Dispute successfully submitted!');
+      history.push('/dashboard');
+
       setCustomerName('');
       setRelatedToEv('');
-      setReason('');
-      setMoreThanOneCharge(false);
-      setWrongCharged(false);
-      setDidNotReceiveRefund(false);
-      setPaidForOtherMeans(false);
+      setMoreThanOneCharge(''); 
+      setWrongCharged(''); 
+      setDidNotReceiveRefund(''); 
+      setPaidForOtherMeans(''); 
       setDisputeTransaction('');
-      setChargedRegularly(false);
-      setNotListedAbove(false);
+      setChargedRegularly(''); 
+      setNotListedAbove(''); 
       setTransactionDetails('');
       setDisputeDetails('');
-      setAssociatedAdminId('');
-      setUserId('');
+      setuserid('');
     } catch (error) {
       if (axios.isAxiosError(error)) {
         setErrorMessage(error.response?.data?.message || 'An error occurred. Please try again.');
@@ -73,7 +88,7 @@ const DisputeForm: React.FC = () => {
       }
     }
   };
-
+  
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-teal-100 via-teal-200 to-blue-100">
       <div className="w-full max-w-md bg-white bg-opacity-60 backdrop-blur-xl rounded-3xl shadow-2xl p-8 h-[100vh] overflow-y-auto">
@@ -92,95 +107,81 @@ const DisputeForm: React.FC = () => {
             />
           </div>
 
-          {/* Related To EV Input */}
+          {/* Related to EV Dropdown */}
           <div>
             <label className="block text-lg font-medium text-gray-700">Related to EV</label>
-            <input
-              type="text"
+            <select
               value={relatedToEv}
               onChange={e => setRelatedToEv(e.target.value)}
               required
               className="mt-2 block w-full p-3 border border-gray-300 rounded-lg bg-white text-gray-900 font-semibold shadow-md focus:outline-none focus:ring-4 focus:ring-teal-300"
-              placeholder="Enter related EV"
-            />
+            >
+              <option value="">Select</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
           </div>
 
-          {/* Reason Input */}
+          {/* Reason Checkboxes */}
           <div>
             <label className="block text-lg font-medium text-gray-700">Reason</label>
-            <input
-              type="text"
-              value={reason}
-              onChange={e => setReason(e.target.value)}
-              required
-              className="mt-2 block w-full p-3 border border-gray-300 rounded-lg bg-white text-gray-900 font-semibold shadow-md focus:outline-none focus:ring-4 focus:ring-teal-300"
-              placeholder="Enter the reason for dispute"
-            />
+            <div className="space-y-2">
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={moreThanOneCharge === 'yes'}
+                  onChange={e => setMoreThanOneCharge(e.target.checked ? 'yes' : 'no')}
+                  className="mr-2"
+                />
+                <label className="text-lg font-medium text-gray-700">More than one charge?</label>
+              </div>
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={wrongCharged === 'yes'}
+                  onChange={e => setWrongCharged(e.target.checked ? 'yes' : 'no')}
+                  className="mr-2"
+                />
+                <label className="text-lg font-medium text-gray-700">Wrong charged?</label>
+              </div>
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={didNotReceiveRefund === 'yes'}
+                  onChange={e => setDidNotReceiveRefund(e.target.checked ? 'yes' : 'no')}
+                  className="mr-2"
+                />
+                <label className="text-lg font-medium text-gray-700">Did not receive refund?</label>
+              </div>
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={paidForOtherMeans === 'yes'}
+                  onChange={e => setPaidForOtherMeans(e.target.checked ? 'yes' : 'no')}
+                  className="mr-2"
+                />
+                <label className="text-lg font-medium text-gray-700">Paid for other means?</label>
+              </div>
+            </div>
           </div>
 
-          {/* More than one charge Checkbox */}
+          {/* Dispute Transaction Checkbox */}
           <div className="flex items-center">
             <input
               type="checkbox"
-              checked={moreThanOneCharge}
-              onChange={e => setMoreThanOneCharge(e.target.checked)}
+              checked={disputeTransaction === 'yes'}
+              onChange={e => setDisputeTransaction(e.target.checked ? 'yes' : 'no')}
               className="mr-2"
             />
-            <label className="text-lg font-medium text-gray-700">More than one charge?</label>
-          </div>
-
-          {/* Wrong Charged Checkbox */}
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              checked={wrongCharged}
-              onChange={e => setWrongCharged(e.target.checked)}
-              className="mr-2"
-            />
-            <label className="text-lg font-medium text-gray-700">Wrong charged?</label>
-          </div>
-
-          {/* Did Not Receive Refund Checkbox */}
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              checked={didNotReceiveRefund}
-              onChange={e => setDidNotReceiveRefund(e.target.checked)}
-              className="mr-2"
-            />
-            <label className="text-lg font-medium text-gray-700">Did not receive refund?</label>
-          </div>
-
-          {/* Paid for Other Means Checkbox */}
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              checked={paidForOtherMeans}
-              onChange={e => setPaidForOtherMeans(e.target.checked)}
-              className="mr-2"
-            />
-            <label className="text-lg font-medium text-gray-700">Paid for other means?</label>
-          </div>
-
-          {/* Dispute Transaction Input */}
-          <div>
-            <label className="block text-lg font-medium text-gray-700">Dispute Transaction</label>
-            <input
-              type="text"
-              value={disputeTransaction}
-              onChange={e => setDisputeTransaction(e.target.value)}
-              required
-              className="mt-2 block w-full p-3 border border-gray-300 rounded-lg bg-white text-gray-900 font-semibold shadow-md focus:outline-none focus:ring-4 focus:ring-teal-300"
-              placeholder="Enter dispute transaction details"
-            />
+            <label className="text-lg font-medium text-gray-700">Dispute Transaction?</label>
           </div>
 
           {/* Charged Regularly Checkbox */}
           <div className="flex items-center">
             <input
               type="checkbox"
-              checked={chargedRegularly}
-              onChange={e => setChargedRegularly(e.target.checked)}
+              checked={chargedRegularly === 'yes'}
+              onChange={e => setChargedRegularly(e.target.checked ? 'yes' : 'no')}
               className="mr-2"
             />
             <label className="text-lg font-medium text-gray-700">Charged regularly?</label>
@@ -190,8 +191,8 @@ const DisputeForm: React.FC = () => {
           <div className="flex items-center">
             <input
               type="checkbox"
-              checked={notListedAbove}
-              onChange={e => setNotListedAbove(e.target.checked)}
+              checked={notListedAbove === 'yes'}
+              onChange={e => setNotListedAbove(e.target.checked ? 'yes' : 'no')}
               className="mr-2"
             />
             <label className="text-lg font-medium text-gray-700">Not listed above?</label>
@@ -205,8 +206,7 @@ const DisputeForm: React.FC = () => {
               onChange={e => setTransactionDetails(e.target.value)}
               required
               className="mt-2 block w-full p-3 border border-gray-300 rounded-lg bg-white text-gray-900 font-semibold shadow-md focus:outline-none focus:ring-4 focus:ring-teal-300"
-              placeholder="Provide transaction details"
-              rows={4}
+              placeholder="Provide transaction details here..."
             />
           </div>
 
@@ -218,48 +218,19 @@ const DisputeForm: React.FC = () => {
               onChange={e => setDisputeDetails(e.target.value)}
               required
               className="mt-2 block w-full p-3 border border-gray-300 rounded-lg bg-white text-gray-900 font-semibold shadow-md focus:outline-none focus:ring-4 focus:ring-teal-300"
-              placeholder="Provide additional details regarding the dispute"
-              rows={4}
+              placeholder="Provide dispute details here..."
             />
           </div>
 
-          {/* Associated Admin ID Input */}
-          <div>
-            <label className="block text-lg font-medium text-gray-700">Associated Admin ID</label>
-            <input
-              type="text"
-              value={associatedAdminId}
-              onChange={e => setAssociatedAdminId(e.target.value)}
-              required
-              className="mt-2 block w-full p-3 border border-gray-300 rounded-lg bg-white text-gray-900 font-semibold shadow-md focus:outline-none focus:ring-4 focus:ring-teal-300"
-              placeholder="Enter associated admin ID"
-            />
-          </div>
+          {errorMessage && <div className="text-red-500 text-center">{errorMessage}</div>}
+          {successMessage && <div className="text-green-500 text-center">{successMessage}</div>}
 
-          {/* User ID Input */}
-          <div>
-            <label className="block text-lg font-medium text-gray-700">User ID</label>
-            <input
-              type="text"
-              value={userId}
-              onChange={e => setUserId(e.target.value)}
-              required
-              className="mt-2 block w-full p-3 border border-gray-300 rounded-lg bg-white text-gray-900 font-semibold shadow-md focus:outline-none focus:ring-4 focus:ring-teal-300"
-              placeholder="Enter your user ID"
-            />
-          </div>
-
-          {/* Submit Button */}
           <button
             type="submit"
-            className="w-full mt-4 p-3 bg-teal-600 text-white rounded-lg shadow-md hover:bg-teal-700 focus:outline-none focus:ring-4 focus:ring-teal-300"
+            className="mt-4 w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-6 rounded-lg shadow-md focus:outline-none focus:ring-4 focus:ring-teal-300"
           >
             Submit Dispute
           </button>
-
-          {/* Success and Error Messages */}
-          {successMessage && <p className="text-green-500 mt-4">{successMessage}</p>}
-          {errorMessage && <p className="text-red-500 mt-4">{errorMessage}</p>}
         </form>
       </div>
     </div>
