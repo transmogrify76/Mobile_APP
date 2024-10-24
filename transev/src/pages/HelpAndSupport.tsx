@@ -1,0 +1,127 @@
+import React, { useState } from 'react';
+import axios from 'axios';
+import { useHistory } from 'react-router-dom'; // Import useHistory
+
+const HelpAndSupport: React.FC = () => {
+  const history = useHistory(); // Initialize useHistory
+  const [name, setName] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [phoneNumber, setPhoneNumber] = useState<string>('');
+  const [userMessage, setUserMessage] = useState<string>('');
+  const [successMessage, setSuccessMessage] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string>('');
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setSuccessMessage('');
+    setErrorMessage('');
+
+    try {
+      const response = await axios.post('https://transev.site/admin/has', {
+        name,
+        email,
+        phonenumber: phoneNumber,
+        usermessage: userMessage,
+      }, {
+        headers: {
+          'apiauthkey': "aBcD1eFgH2iJkLmNoPqRsTuVwXyZ012345678jasldjalsdjurewouroewiru",
+        },
+      });
+
+      setSuccessMessage(response.data.message);
+      setName('');
+      setEmail('');
+      setPhoneNumber('');
+      setUserMessage('');
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        setErrorMessage(error.response?.data?.message || 'An error occurred. Please try again.');
+      } else {
+        setErrorMessage('An error occurred. Please try again.');
+      }
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-teal-100 via-teal-200 to-blue-100">
+      <div className="w-full max-w-md bg-white bg-opacity-60 backdrop-blur-xl rounded-3xl shadow-2xl p-8 h-[100vh] overflow-y-auto">
+        <h2 className="text-4xl font-bold text-center text-teal-800 mb-6">Help & Support</h2>
+        <form onSubmit={handleSubmit} noValidate className="space-y-4">
+          {/* Name Input */}
+          <div>
+            <label className="block text-lg font-medium text-gray-700">Name</label>
+            <input
+              type="text"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              required
+              className="mt-2 block w-full p-3 border border-gray-300 rounded-lg bg-white text-gray-900 font-semibold shadow-md focus:outline-none focus:ring-4 focus:ring-teal-300"
+              placeholder="Enter your name"
+            />
+          </div>
+
+          {/* Email Input */}
+          <div>
+            <label className="block text-lg font-medium text-gray-700">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+              className="mt-2 block w-full p-3 border border-gray-300 rounded-lg bg-white text-gray-900 font-semibold shadow-md focus:outline-none focus:ring-4 focus:ring-teal-300"
+              placeholder="Enter your email"
+            />
+          </div>
+
+          {/* Phone Number Input */}
+          <div>
+            <label className="block text-lg font-medium text-gray-700">Phone Number</label>
+            <input
+              type="tel"
+              value={phoneNumber}
+              onChange={e => setPhoneNumber(e.target.value)}
+              required
+              className="mt-2 block w-full p-3 border border-gray-300 rounded-lg bg-white text-gray-900 font-semibold shadow-md focus:outline-none focus:ring-4 focus:ring-teal-300"
+              placeholder="Enter your phone number"
+            />
+          </div>
+
+          {/* Message Input */}
+          <div>
+            <label className="block text-lg font-medium text-gray-700">Your Message</label>
+            <textarea
+              value={userMessage}
+              onChange={e => setUserMessage(e.target.value)}
+              required
+              className="mt-2 block w-full p-3 border border-gray-300 rounded-lg bg-white text-gray-900 font-semibold shadow-md focus:outline-none focus:ring-4 focus:ring-teal-300"
+              placeholder="Type your message here"
+              rows={4}
+            />
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="w-full bg-teal-500 text-white font-bold py-3 rounded-full shadow-lg hover:bg-teal-600 transition duration-300 ease-in-out"
+          >
+            Send Message
+          </button>
+        </form>
+
+        {/* Success and Error Messages */}
+        {successMessage && <p className="text-green-500 text-center mt-4">{successMessage}</p>}
+        {errorMessage && <p className="text-red-500 text-center mt-4">{errorMessage}</p>}
+        
+        {/* Past Messages Button */}
+        <button
+          className="w-full mt-4 bg-teal-400 text-white font-bold py-3 rounded-full shadow-lg hover:bg-teal-500 transition duration-300 ease-in-out"
+          onClick={() => history.push('/viewhelp')} // Navigate to /viewhelp
+        >
+          Past Messages
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default HelpAndSupport;

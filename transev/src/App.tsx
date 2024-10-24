@@ -12,6 +12,10 @@ import VehicleCreation from './pages/VehicleCreation';
 import UserProfile from './pages/UserProfile';
 import FavoriteChargers from './pages/FavoriteChargers';
 import MyBookings from './pages/MyBookings';
+import HelpAndSupport from './pages/HelpAndSupport';
+import UserMessages from './pages/UserMessages';
+import DisputeForm from './pages/DisputeForm';
+
 
 
 const App: React.FC = () => (
@@ -30,6 +34,10 @@ const App: React.FC = () => (
         <Route path="/userprofile" component={UserProfile} exact={true} />
         <Route path="/favourites" component={FavoriteChargers} exact={true} />
         <Route path="/bookings" component={MyBookings} exact={true} />
+        <Route path="/help" component={HelpAndSupport} exact={true} />
+        <Route path="/viewhelp" component={UserMessages} exact={true} />
+        <Route path="/dispute" component={DisputeForm} exact={true} />
+
 
 
       </IonRouterOutlet>

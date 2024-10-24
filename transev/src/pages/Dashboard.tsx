@@ -1,6 +1,6 @@
 import React, { useState, useEffect, ReactNode } from 'react';
 import { FaSearch, FaFilter, FaHeart, FaWallet, FaUser, FaQrcode, FaBars, FaMapMarkerAlt } from 'react-icons/fa'; 
-import { useHistory } from 'react-router-dom'; // Change here
+import { useHistory } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import QRScannerComponent from './QRScanner'; 
 import { jwtDecode } from 'jwt-decode'; 
@@ -21,7 +21,7 @@ interface Charger {
 }
 
 const Dashboard = () => {
-    const history = useHistory(); // Use history instead of navigate
+    const history = useHistory();
     const [isSidebarOpen, setSidebarOpen] = useState(false);
     const [isScannerOpen, setScannerOpen] = useState(false);
     const [chargers, setChargers] = useState<Charger[]>([]);
@@ -149,9 +149,13 @@ const Dashboard = () => {
                         {chargers.map((charger) => (
                             <div key={charger.uid} className="flex items-center bg-white rounded-lg shadow-md p-4 mb-6">
                                 <img
-                                    src={charger.image_url || 'default_image_placeholder.jpg'}
-                                    alt="Charger"
+                                    src={charger.image_url || 'https://transev.in/wp-content/uploads/elementor/thumbs/Asian-DC-24KW-qg3zamgu8te4ak3xj8wizdb96mbcsqdsr05l5u2qao.png'} // default image URL
+                                    alt={charger.name || 'Charger'} // provide a fallback name
                                     className="w-16 h-16 rounded-lg object-cover mr-4 shadow"
+                                    onError={(e) => {
+                                        e.currentTarget.onerror = null; // prevents looping
+                                        e.currentTarget.src = 'https://transev.in/wp-content/uploads/elementor/thumbs/Asian-DC-24KW-qg3zamgu8te4ak3xj8wizdb96mbcsqdsr05l5u2qao.png'; // fallback image URL if error occurs
+                                    }}
                                 />
                                 <div className="flex flex-col flex-grow">
                                     <h3 className="text-lg font-semibold text-gray-800">{charger.chargeridentity}</h3>
@@ -189,11 +193,13 @@ const Dashboard = () => {
                 </div>
                 <div className="flex flex-col items-center p-1 cursor-pointer hover:bg-gray-100 transition" onClick={toggleScanner}>
                     <FaQrcode className="text-2xl" style={{ color: '#2E8B57' }} />
-                    <p className="text-xs">QR Scan</p>
+                    <p className="text-xs">QR Code</p>
                 </div>
             </div>
 
-            {isScannerOpen && <QRScannerComponent onClose={toggleScanner} />}
+            {isScannerOpen && (
+                <QRScannerComponent onClose={toggleScanner} />
+            )}
         </div>
     );
 };
