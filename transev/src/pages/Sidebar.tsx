@@ -21,6 +21,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
     window.open('tel:8084281810'); // Make a call
   };
 
+  const handleLogout = () => {
+    // Clear any authentication tokens or user data
+    localStorage.removeItem('token'); // Remove the token from local storage
+    // Add any other cleanup logic if necessary (e.g., clearing user data)
+
+    // Redirect to the login page
+    history.push('/login'); // Adjust the path as per your routing structure
+  };
+
   return (
     <div className={`h-full bg-black text-white p-5 flex flex-col justify-between transition-transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} absolute top-0 left-0 z-10`}>
       <div>
@@ -54,7 +63,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
         <button className="flex items-center bg-blue-500 px-4 py-2 rounded-md w-full"  onClick={() => handleNavigation('/help')}>
           <IonIcon icon={call} className="mr-3" /> Help & Support
         </button>
-        <button className="flex items-center bg-gray-600 px-4 py-2 rounded-md w-full" onClick={toggleSidebar}>
+        <button className="flex items-center bg-gray-600 px-4 py-2 rounded-md w-full" onClick={handleLogout}>
           <IonIcon icon={logOut} className="mr-3" /> Log Out
         </button>
         <p className="text-center text-gray-400">1.0.4v</p>

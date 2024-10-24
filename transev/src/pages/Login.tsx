@@ -1,19 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useHistory } from 'react-router-dom'; // Import useHistory
+import { useHistory } from 'react-router-dom';
 
 const Login: React.FC = () => {
-    const history = useHistory(); // Initialize useHistory hook
+    const history = useHistory();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [otp, setOtp] = useState<string[]>(Array(6).fill('')); // 6 OTP inputs
+    const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
     const [isOtpSent, setIsOtpSent] = useState(false);
     const [message, setMessage] = useState('');
 
+    // Check if user is already logged in
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            history.push('/dashboard'); // Redirect to dashboard if logged in
+        }
+    }, [history]);
+
     const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const apiUrl = 'https://transev.site/userauth/login'; // Replace with your API URL
-        const payload = { email, password, otp: isOtpSent ? otp.join('') : undefined }; // Join OTP digits
+        const apiUrl = 'https://transev.site/userauth/login';
+        const payload = { email, password, otp: isOtpSent ? otp.join('') : undefined };
 
         try {
             const response = await axios.post(apiUrl, payload, {
@@ -25,11 +33,11 @@ const Login: React.FC = () => {
             setMessage(response.data.message);
 
             if (response.status === 201) {
-                setIsOtpSent(true); // If OTP is sent, prompt user for OTP input
+                setIsOtpSent(true);
             } else if (response.status === 200) {
                 const { token } = response.data;
-                localStorage.setItem('token', token); // Save the JWT token
-                history.push('/dashboard'); // Redirect to the user dashboard
+                localStorage.setItem('token', token);
+                history.push('/dashboard');
             }
         } catch (error) {
             if (axios.isAxiosError(error)) {
@@ -42,7 +50,7 @@ const Login: React.FC = () => {
 
     const handleOtpChange = (value: string, index: number) => {
         const newOtp = [...otp];
-        newOtp[index] = value.slice(-1); // Only take the last character
+        newOtp[index] = value.slice(-1);
         setOtp(newOtp);
 
         if (value && index < 5) {
@@ -55,8 +63,8 @@ const Login: React.FC = () => {
     };
 
     const handleOtpVerification = async () => {
-        const apiUrl = 'https://transev.site/userauth/login'; // Use the same endpoint
-        const payload = { email, password, otp: otp.join('') }; // Join OTP digits
+        const apiUrl = 'https://transev.site/userauth/login';
+        const payload = { email, password, otp: otp.join('') };
 
         try {
             const response = await axios.post(apiUrl, payload, {
@@ -70,7 +78,7 @@ const Login: React.FC = () => {
             if (response.status === 200) {
                 const { token } = response.data;
                 localStorage.setItem('token', token);
-                history.push('/dashboard'); // Redirect to the user dashboard
+                history.push('/dashboard');
             }
         } catch (error) {
             if (axios.isAxiosError(error)) {
@@ -84,10 +92,7 @@ const Login: React.FC = () => {
     return (
         <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-teal-100 via-teal-200 to-blue-100">
             <div className="w-full h-screen flex items-center justify-center">
-                {/* Form Container */}
                 <div className="w-full max-w-md h-full bg-white bg-opacity-60 backdrop-blur-xl rounded-3xl shadow-2xl p-8 flex flex-col justify-center">
-                    
-                    {/* Logo */}
                     <div className="flex justify-center mb-6">
                         <img
                             src="https://transev.in/wp-content/uploads/2023/07/logo-160x57.png"
@@ -97,10 +102,8 @@ const Login: React.FC = () => {
                     </div>
 
                     <h2 className="text-4xl font-bold text-center text-teal-800 mb-6">Login</h2>
-                    
-                    {/* Login Form */}
+
                     <form onSubmit={handleLogin} noValidate className="space-y-4">
-                        {/* Email Input */}
                         <div>
                             <label className="block text-lg font-medium text-gray-700">Email</label>
                             <input
@@ -113,7 +116,6 @@ const Login: React.FC = () => {
                             />
                         </div>
 
-                        {/* Password Input */}
                         <div>
                             <label className="block text-lg font-medium text-gray-700">Password</label>
                             <input
@@ -143,7 +145,6 @@ const Login: React.FC = () => {
                             </div>
                         )}
 
-                        {/* Submit Button */}
                         <button
                             type="submit"
                             className="w-full bg-teal-500 text-white font-bold py-3 rounded-full shadow-lg hover:bg-teal-600 transition duration-300 ease-in-out"
@@ -153,10 +154,8 @@ const Login: React.FC = () => {
                         </button>
                     </form>
 
-                    {/* Message Display */}
                     {message && <p className="text-red-500 text-center mt-4">{message}</p>}
 
-                    {/* Forgot Password Link */}
                     <div className="mt-4 text-center">
                         <a href="/reset" className="text-teal-600 font-bold hover:underline">
                             Forgot Password?
@@ -171,7 +170,6 @@ const Login: React.FC = () => {
                             </a>
                         </p>
                     </div>
-
                 </div>
             </div>
         </div>
