@@ -6,7 +6,6 @@ import Menu from './components/Menu';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
-import HomePage from './pages/HomePage';
 import Wallet from './pages/Wallet';
 import VehicleCreation from './pages/VehicleCreation';
 import UserProfile from './pages/UserProfile';
@@ -16,6 +15,7 @@ import HelpAndSupport from './pages/HelpAndSupport';
 import UserMessages from './pages/UserMessages';
 import DisputeForm from './pages/DisputeForm';
 import ResetPassword from './pages/ResetPassword';
+import TransactionHistory from './pages/TransactionHistory';
 
 
 const App: React.FC = () => (
@@ -25,7 +25,6 @@ const App: React.FC = () => (
       <IonRouterOutlet>
 
         <Route path="" component={Login} exact={true} />
-        <Route path="/home" component={HomePage} exact={true} />
         <Route path="/signup" component={Signup} exact={true} />
         <Route path="/login" component={Login} exact={true} />
         <Route path="/dashboard" component={Dashboard} exact={true} />
@@ -38,6 +37,8 @@ const App: React.FC = () => (
         <Route path="/viewhelp" component={UserMessages} exact={true} />
         <Route path="/dispute" component={DisputeForm} exact={true} />
         <Route path="/reset" component={ResetPassword} exact={true} />
+        <Route path="/transaction" component={TransactionHistory} exact={true} />
+
 
 
 

@@ -54,8 +54,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
           <button className="flex items-center bg-blue-500 px-4 py-2 rounded-md w-full" onClick={() => handleNavigation('/add-vehicle')}>
             <IonIcon icon={car} className="mr-3" /> My Vehicles
           </button>
-          <button className="flex items-center bg-blue-500 px-4 py-2 rounded-md w-full" onClick={() => handleNavigation('/charging-history')}>
-            <IonIcon icon={time} className="mr-3" /> Charging History
+          <button className="flex items-center bg-blue-500 px-4 py-2 rounded-md w-full" onClick={() => handleNavigation('/transaction')}>
+            <IonIcon icon={time} className="mr-3" /> Transaction History
           </button>
         </div>
       </div>
