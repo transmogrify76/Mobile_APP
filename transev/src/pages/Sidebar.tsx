@@ -2,6 +2,7 @@ import React from 'react';
 import { IonIcon } from '@ionic/react';
 import { person, bookmark, heart, car, time, call, logOut } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
+import {jwtDecode} from 'jwt-decode'; // Import jwtDecode
 
 // Define the props interface
 interface SidebarProps {
@@ -9,8 +10,31 @@ interface SidebarProps {
   toggleSidebar: () => void;
 }
 
+// Define the token structure interface
+interface DecodedToken {
+  username: string;
+  email: string;
+  userid: string;
+  userType: string;
+  adminuid: string;
+  iat: number;
+  exp: number;
+}
+
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   const history = useHistory(); // Use useHistory for navigation
+  const token = localStorage.getItem('token'); // Get the token from localStorage
+  let username = ''; // Initialize username
+
+  // Decode the token to get the username
+  if (token) {
+    try {
+      const decodedToken: DecodedToken = jwtDecode(token); // Decode the token
+      username = decodedToken.username; // Extract username
+    } catch (error) {
+      console.error('Error decoding token:', error);
+    }
+  }
 
   const handleNavigation = (path: string) => {
     history.push(path);
@@ -37,7 +61,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
           <div className="bg-gray-600 w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center">
             <span className="text-white text-2xl">C</span>
           </div>
-          <h3 className="text-xl">Chitradeep Ghosh</h3>
+          <h3 className="text-xl">{username || 'Guest'}</h3> {/* Display username or 'Guest' */}
           <p className="text-green-400 mt-1">₹ 0.00</p>
           <p className="text-gray-400 text-sm">Current Balance</p>
         </div>
@@ -60,7 +84,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
         </div>
       </div>
       <div className="space-y-4">
-        <button className="flex items-center bg-blue-500 px-4 py-2 rounded-md w-full"  onClick={() => handleNavigation('/help')}>
+        <button className="flex items-center bg-blue-500 px-4 py-2 rounded-md w-full" onClick={() => handleNavigation('/help')}>
           <IonIcon icon={call} className="mr-3" /> Help & Support
         </button>
         <button className="flex items-center bg-gray-600 px-4 py-2 rounded-md w-full" onClick={handleLogout}>
