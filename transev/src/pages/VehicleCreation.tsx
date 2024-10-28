@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useHistory } from 'react-router-dom'; // Import useHistory for navigation
+import { FaHome } from 'react-icons/fa'; // Import the home icon from react-icons
 
 const VehicleCreation: React.FC = () => {
+  const history = useHistory(); // Create history object
   const [vehicleName, setVehicleName] = useState<string>('');
   const [vehicleModel, setVehicleModel] = useState<string>('');
   const [vehicleLicense, setVehicleLicense] = useState<string>('');
@@ -13,7 +16,6 @@ const VehicleCreation: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     setErrorMessage('');
     setSuccessMessage('');
 
@@ -56,7 +58,7 @@ const VehicleCreation: React.FC = () => {
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-teal-100 via-teal-200 to-blue-100">
       <div className="w-full h-screen flex items-center justify-center">
         <div className="w-full max-w-md h-[100vh] bg-white bg-opacity-60 backdrop-blur-xl rounded-3xl shadow-2xl p-8 flex flex-col justify-center overflow-hidden">
-
+          
           {/* Logo */}
           <div className="flex justify-center mb-6">
             <img
@@ -67,6 +69,16 @@ const VehicleCreation: React.FC = () => {
           </div>
 
           <h2 className="text-4xl font-bold text-center text-teal-800 mb-6">Create Vehicle</h2>
+
+          {/* Home Icon and Navigation */}
+          <div className="flex justify-between items-center mb-4">
+            <button
+              onClick={() => history.push('/')}
+              className="flex items-center text-teal-500 hover:text-teal-600 transition duration-300 ease-in-out"
+            >
+              <FaHome className="mr-2" /> Home
+            </button>
+          </div>
 
           <div className="overflow-y-auto h-full">
             <form onSubmit={handleSubmit} noValidate className="space-y-4">
@@ -152,6 +164,7 @@ const VehicleCreation: React.FC = () => {
             </form>
           </div>
 
+          {/* Display Messages */}
           {errorMessage && <p className="text-red-500 text-center mt-4">{errorMessage}</p>}
           {successMessage && <p className="text-green-500 text-center mt-4">{successMessage}</p>}
         </div>

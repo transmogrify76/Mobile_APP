@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
+import { IonIcon } from '@ionic/react'; // Import IonIcon for the home icon
+import { home } from 'ionicons/icons'; // Import the home icon
+import { useHistory } from 'react-router-dom'; // Import useHistory for navigation
 
 declare var Razorpay: any; // Declare Razorpay
 
 const Wallet: React.FC = () => {
+  const history = useHistory(); // Initialize useHistory
   const [balance, setBalance] = useState<number>(0); // Initial balance set to 0
   const [selectedAmount, setSelectedAmount] = useState<number>(0); // To track selected amount
 
@@ -40,9 +44,17 @@ const Wallet: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-teal-100 via-teal-200 to-blue-100">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-teal-100 via-teal-200 to-blue-100 relative">
       <div className="w-full h-screen flex items-center justify-center">
         <div className="w-full max-w-md bg-white bg-opacity-60 backdrop-blur-xl rounded-3xl shadow-2xl p-8 flex flex-col justify-between h-full">
+          {/* Home Icon Button */}
+          <button
+            className="absolute top-4 left-4 p-2 rounded-full bg-teal-500 text-white shadow-lg hover:bg-teal-600 transition duration-300"
+            onClick={() => history.push('/dashboard')}
+          >
+            <IonIcon icon={home} />
+          </button>
+
           <div className="flex justify-center mb-6">
             <img
               src="https://transev.in/wp-content/uploads/2023/07/logo-160x57.png"

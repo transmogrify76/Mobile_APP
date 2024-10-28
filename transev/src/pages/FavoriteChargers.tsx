@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { IonIcon } from '@ionic/react'; // Import IonIcon for the home icon
+import { home } from 'ionicons/icons'; // Import the home icon
+import { useHistory } from 'react-router-dom'; // Import useHistory for navigation
 import { jwtDecode } from 'jwt-decode';
 
 // Define the token structure interface
@@ -14,6 +17,7 @@ interface DecodedToken {
 }
 
 const FavoriteChargers: React.FC = () => {
+    const history = useHistory(); // Initialize useHistory
     const [favoriteChargers, setFavoriteChargers] = useState<any[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -78,6 +82,14 @@ const FavoriteChargers: React.FC = () => {
     return (
         <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-teal-100 via-teal-200 to-blue-100">
             <div className="container mx-auto p-4">
+                {/* Home Icon Button */}
+                <button
+                    className="absolute top-4 left-4 p-2 rounded-full bg-teal-500 text-white shadow-lg hover:bg-teal-600 transition duration-300"
+                    onClick={() => history.push('/dashboard')} // Navigate to dashboard
+                >
+                    <IonIcon icon={home} />
+                </button>
+
                 <h2 className="text-4xl font-bold text-center text-teal-800 mb-6">My Favorite Chargers</h2>
 
                 {loading ? (

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { jsPDF } from 'jspdf';
+import { useHistory } from 'react-router-dom'; // Import useHistory for navigation
+import { FaHome } from 'react-icons/fa'; // Import the home icon from react-icons
 
 interface Transaction {
   uid: string;
@@ -17,6 +19,7 @@ interface Transaction {
 }
 
 const TransactionHistory: React.FC = () => {
+  const history = useHistory(); // Create history object
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [error, setError] = useState('');
 
@@ -63,6 +66,17 @@ const TransactionHistory: React.FC = () => {
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-teal-100 via-teal-200 to-blue-100">
       <div className="container mx-auto p-4">
         <h2 className="text-4xl font-bold text-center text-teal-800 mb-6">Transaction History</h2>
+
+        {/* Home Icon and Navigation */}
+        <div className="flex justify-between items-center mb-4">
+          <button
+            onClick={() => history.push('/')} // Navigate to home on click
+            className="flex items-center text-teal-500 hover:text-teal-600 transition duration-300 ease-in-out"
+          >
+            <FaHome className="mr-2" /> Home
+          </button>
+        </div>
+
         {error ? (
           <div className="text-red-500 text-center">{error}</div>
         ) : transactions.length > 0 ? (

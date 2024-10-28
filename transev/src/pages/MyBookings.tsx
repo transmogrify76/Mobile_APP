@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import {jwtDecode} from 'jwt-decode'; // Import the jwt-decode library
+import { jwtDecode } from 'jwt-decode';
 import { useHistory } from 'react-router-dom';
+import { FaHome } from 'react-icons/fa'; // Import the home icon from react-icons
 
 interface Booking {
     uid: string;
@@ -26,16 +27,14 @@ const MyBookings: React.FC = () => {
     const [isBooked, setIsBooked] = useState(false);
 
     const fetchBookings = async () => {
-        const apiUrl = 'https://transev.site/userauth/getlistofbookings'; // API URL for getting bookings
+        const apiUrl = 'https://transev.site/userauth/getlistofbookings';
 
-        // Get the token from local storage
         const token = localStorage.getItem('token');
         if (!token) {
             setMessage('User not authenticated.');
             return;
         }
 
-        // Decode the token to get user ID
         const decodedToken: { userid: string } = jwtDecode(token);
         const userId = decodedToken.userid;
 
@@ -45,7 +44,7 @@ const MyBookings: React.FC = () => {
                     'apiauthkey': process.env.REACT_APP_API_KEY // Your API Key
                 }
             });
-            
+
             setBookings(response.data.bookings);
             setChargerDetails(response.data.chargerDetails);
         } catch (error) {
@@ -58,22 +57,20 @@ const MyBookings: React.FC = () => {
     };
 
     useEffect(() => {
-        fetchBookings(); // Fetch bookings when component mounts
+        fetchBookings();
     }, []);
 
     const handleCreateBooking = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const apiUrl = 'https://transev.site/userauth/chargerbookings'; // API URL for creating bookings
+        const apiUrl = 'https://transev.site/userauth/chargerbookings';
 
-        // Get the token from local storage
         const token = localStorage.getItem('token');
         if (!token) {
             setMessage('User not authenticated.');
             return;
         }
 
-        // Decode the token to get user ID
         const decodedToken: { userid: string } = jwtDecode(token);
         const userId = decodedToken.userid;
 
@@ -81,18 +78,17 @@ const MyBookings: React.FC = () => {
             const response = await axios.post(apiUrl, {
                 chargeruid: chargerUID,
                 useruid: userId,
-                isbooked: isBooked.toString(), // Send as string
+                isbooked: isBooked.toString(),
             }, {
                 headers: {
-                    'apiauthkey':"aBcD1eFgH2iJkLmNoPqRsTuVwXyZ012345678jasldjalsdjurewouroewiru"// Your API Key
+                    'apiauthkey': "aBcD1eFgH2iJkLmNoPqRsTuVwXyZ012345678jasldjalsdjurewouroewiru"
                 }
             });
 
             setMessage(response.data.message);
             setChargerUID('');
             setIsBooked(false);
-            // Re-fetch bookings after creating a new booking
-            await fetchBookings(); // Now it calls the defined function
+            await fetchBookings();
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 setMessage(error.response?.data?.message || 'Failed to create booking.');
@@ -104,7 +100,15 @@ const MyBookings: React.FC = () => {
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-teal-100 via-teal-200 to-blue-100">
-            <div className="w-full max-w-lg bg-white bg-opacity-60 backdrop-blur-xl rounded-3xl shadow-2xl p-8">
+            <div className="w-full max-w-lg bg-white bg-opacity-60 backdrop-blur-xl rounded-3xl shadow-2xl p-8 relative">
+                {/* Home Icon Button */}
+                <button
+                    onClick={() => history.push('/dashboard')}
+                    className="absolute top-4 left-4 p-2 bg-teal-500 rounded-full shadow-md hover:bg-teal-600 transition duration-300"
+                >
+                    <FaHome className="text-white" />
+                </button>
+
                 <h2 className="text-4xl font-bold text-center text-teal-800 mb-6">My Bookings</h2>
 
                 {message && <p className="text-red-500 text-center mb-4">{message}</p>}

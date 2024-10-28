@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { IonIcon } from '@ionic/react'; // Import IonIcon for the home icon
+import { home } from 'ionicons/icons'; // Import the home icon
+import { useHistory } from 'react-router-dom'; // Import useHistory for navigation
 
 interface UserData {
   name: string;
@@ -9,6 +12,7 @@ interface UserData {
 }
 
 const UserProfile: React.FC = () => {
+  const history = useHistory(); // Initialize useHistory
   const [userData, setUserData] = useState<UserData>({
     name: '',
     email: '',
@@ -25,59 +29,58 @@ const UserProfile: React.FC = () => {
 
   useEffect(() => {
     const fetchProfileDetails = async () => {
-  setLoading(true);
-  try {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      setErrorMessage('User is not logged in or token is missing.');
-      return;
-    }
+      setLoading(true);
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          setErrorMessage('User is not logged in or token is missing.');
+          return;
+        }
 
-    const userid = JSON.parse(atob(token.split('.')[1])).userid; // Assuming userid is in the payload of the token
+        const userid = JSON.parse(atob(token.split('.')[1])).userid; // Assuming userid is in the payload of the token
 
-    const response = await axios.post(
-      'https://transev.site/users/puprofile',
-      { userid: userid },
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'apiauthkey': 'aBcD1eFgH2iJkLmNoPqRsTuVwXyZ012345678jasldjalsdjurewouroewiru',
-        },
+        const response = await axios.post(
+          'https://transev.site/users/puprofile',
+          { userid: userid },
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'apiauthkey': 'aBcD1eFgH2iJkLmNoPqRsTuVwXyZ012345678jasldjalsdjurewouroewiru',
+            },
+          }
+        );
+
+        if (response.data && response.data.data) {
+          const { username, phonenumber, email, profilepicture } = response.data.data;
+          const { pfimage } = response.data; // Get pfimage from the response
+
+          setUserData({
+            name: username || '', // Map username to name
+            email: email || '',
+            phone: phonenumber || null, // Map phonenumber to phone
+            profilePicture: pfimage || null, // Map pfimage to profile picture
+          });
+          setFormData({
+            name: username || '',
+            email: email || '',
+            phone: phonenumber || null,
+            profilePicture: pfimage || null, // Map pfimage to form data
+          });
+          setSuccessMessage('Profile details fetched successfully!');
+        } else {
+          throw new Error('Invalid response structure.');
+        }
+      } catch (error: unknown) {
+        console.error('Error fetching profile:', error);
+        if (error instanceof Error) {
+          setErrorMessage('Error fetching profile details. ' + error.message);
+        } else {
+          setErrorMessage('Error fetching profile details.');
+        }
+      } finally {
+        setLoading(false);
       }
-    );
-
-    if (response.data && response.data.data) {
-      const { username, phonenumber, email, profilepicture } = response.data.data;
-      const { pfimage } = response.data; // Get pfimage from the response
-
-      setUserData({
-        name: username || '', // Map username to name
-        email: email || '',
-        phone: phonenumber || null, // Map phonenumber to phone
-        profilePicture: pfimage || null, // Map pfimage to profile picture
-      });
-      setFormData({
-        name: username || '',
-        email: email || '',
-        phone: phonenumber || null,
-        profilePicture: pfimage || null, // Map pfimage to form data
-      });
-      setSuccessMessage('Profile details fetched successfully!');
-    } else {
-      throw new Error('Invalid response structure.');
-    }
-  } catch (error: unknown) {
-    console.error('Error fetching profile:', error);
-    if (error instanceof Error) {
-      setErrorMessage('Error fetching profile details. ' + error.message);
-    } else {
-      setErrorMessage('Error fetching profile details.');
-    }
-  } finally {
-    setLoading(false);
-  }
-};
-
+    };
 
     fetchProfileDetails();
   }, []);
@@ -160,9 +163,6 @@ const UserProfile: React.FC = () => {
       }
     }
   };
-  
-  
-  
 
   const handleEditClick = () => {
     setEditMode(true);
@@ -177,7 +177,15 @@ const UserProfile: React.FC = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-teal-100 via-teal-200 to-blue-100">
       <div className="w-full h-screen flex items-center justify-center">
-        <div className="w-full max-w-md h-full bg-white bg-opacity-60 backdrop-blur-xl rounded-3xl shadow-2xl p-8 flex flex-col justify-center">
+        <div className="w-full max-w-md h-full bg-white bg-opacity-60 backdrop-blur-xl rounded-3xl shadow-2xl p-8 flex flex-col justify-center relative">
+          {/* Home Icon Button */}
+          <button
+            className="absolute top-4 left-4 p-2 rounded-full bg-teal-500 text-white shadow-lg hover:bg-teal-600 transition duration-300"
+            onClick={() => history.push('/dashboard')}
+          >
+            <IonIcon icon={home} />
+          </button>
+
           <div className="flex justify-center mb-6">
             <img
               src={userData.profilePicture || 'https://via.placeholder.com/100'}
@@ -228,32 +236,47 @@ const UserProfile: React.FC = () => {
                 />
               </div>
 
-              {/* New File Input for Profile Picture */}
-              {editMode && (
-                <div>
-                  <label className="block text-lg font-medium text-gray-700">Profile Picture</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    className="mt-2 block w-full p-2 border border-gray-300 rounded-lg bg-white text-gray-900"
-                  />
-                </div>
-              )}
-
-              <div className="flex justify-between mt-6">
-                {editMode ? (
-                  <>
-                    <button type="button" onClick={handleCancelClick} className="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg">Cancel</button>
-                    <button type="submit" className="px-4 py-2 bg-teal-600 text-white rounded-lg">Save</button>
-                  </>
-                ) : (
-                  <button type="button" onClick={handleEditClick} className="px-4 py-2 bg-teal-600 text-white rounded-lg">Edit</button>
-                )}
+              <div>
+                <label className="block text-lg font-medium text-gray-700">Profile Picture</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  disabled={!editMode}
+                  className={`mt-2 block w-full text-sm text-gray-500 cursor-pointer ${editMode ? '' : 'bg-gray-100 cursor-not-allowed'}`}
+                />
               </div>
 
-              {successMessage && <p className="text-green-500 text-center">{successMessage}</p>}
-              {errorMessage && <p className="text-red-500 text-center">{errorMessage}</p>}
+              {successMessage && <p className="text-green-600">{successMessage}</p>}
+              {errorMessage && <p className="text-red-600">{errorMessage}</p>}
+
+              <div className="flex justify-between">
+                {editMode ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleCancelClick}
+                      className="px-4 py-2 bg-gray-300 rounded-lg shadow-md hover:bg-gray-400 transition duration-300"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 bg-teal-500 text-white rounded-lg shadow-md hover:bg-teal-600 transition duration-300"
+                    >
+                      Update
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleEditClick}
+                    className="px-4 py-2 bg-teal-500 text-white rounded-lg shadow-md hover:bg-teal-600 transition duration-300"
+                  >
+                    Edit Profile
+                  </button>
+                )}
+              </div>
             </form>
           )}
         </div>

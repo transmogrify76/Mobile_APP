@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom'; // Import useHistory
+import { FaHome } from 'react-icons/fa'; // Import the home icon from react-icons
 
 const HelpAndSupport: React.FC = () => {
   const history = useHistory(); // Initialize useHistory
@@ -43,8 +44,14 @@ const HelpAndSupport: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-teal-100 via-teal-200 to-blue-100">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-teal-100 via-teal-200 to-blue-100 relative">
+      {/* Home Icon */}
+      
       <div className="w-full max-w-md bg-white bg-opacity-60 backdrop-blur-xl rounded-3xl shadow-2xl p-8 h-[100vh] overflow-y-auto">
+      <FaHome
+        className="absolute top-4 left-4 text-3xl text-teal-800 cursor-pointer hover:text-teal-600 transition duration-300 ease-in-out"
+        onClick={() => history.push('/dashboard')} // Navigate to /dashboard
+      />
         <h2 className="text-4xl font-bold text-center text-teal-800 mb-6">Help & Support</h2>
         <form onSubmit={handleSubmit} noValidate className="space-y-4">
           {/* Name Input */}
