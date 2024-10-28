@@ -48,6 +48,7 @@ const TransactionHistory: React.FC = () => {
     const doc = new jsPDF();
     doc.setFontSize(16);
     doc.text('Transaction Receipt', 20, 20);
+    
     doc.setFontSize(12);
     doc.text(`User: ${transaction.username}`, 20, 40);
     doc.text(`Last Transaction: ${transaction.lasttransaction}`, 20, 50);

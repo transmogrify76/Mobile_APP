@@ -16,6 +16,7 @@ import UserMessages from './pages/UserMessages';
 import DisputeForm from './pages/DisputeForm';
 import ResetPassword from './pages/ResetPassword';
 import TransactionHistory from './pages/TransactionHistory';
+import MyBookingsList from './pages/MyBookingsList';
 
 
 const App: React.FC = () => (
@@ -38,6 +39,7 @@ const App: React.FC = () => (
         <Route path="/dispute" component={DisputeForm} exact={true} />
         <Route path="/reset" component={ResetPassword} exact={true} />
         <Route path="/transaction" component={TransactionHistory} exact={true} />
+        <Route path="/mybookings" component={MyBookingsList} exact={true} />
 
 
 
