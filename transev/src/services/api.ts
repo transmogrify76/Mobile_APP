@@ -9,9 +9,9 @@ const api = axios.create({
 });
 
 // Function for user signup and OTP verification
-export const signupUser = async (username: string, email: string, password: string, otp?: string) => {
+export const signupUser = async (username: string, email: string,phonenumber:string, password: string, otp?: string, otpString?: string) => {
   try {
-    const payload: any = { username, email, password };
+    const payload: any = { username, email, phonenumber, password };
 
     // If OTP is provided, include it in the payload
     if (otp) {

@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { signupUser } from '../services/api';
 import axios from 'axios';
 
 const Signup: React.FC = () => {
   const [username, setUsername] = useState<string>('');
   const [email, setEmail] = useState<string>('');
+  const [phonenumber, setPhonenumber] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
   const [isOtpSent, setIsOtpSent] = useState<boolean>(false);
@@ -13,29 +14,28 @@ const Signup: React.FC = () => {
 
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+  
     setErrorMessage('');
     setSuccessMessage('');
-
+  
     try {
       if (!isOtpSent) {
-        const result = await signupUser(username, email, password);
+        const result = await signupUser(username, email, phonenumber, password);
         setSuccessMessage(result.message);
         setIsOtpSent(true);
       } else {
         const otpString = otp.join('');
-        const result = await signupUser('', email, '', otpString);
+        const result = await signupUser('', email, '', '', otpString);
         setSuccessMessage(result.message);
       }
     } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        setErrorMessage(error.response?.data?.message as string || 'Something went wrong!');
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        setErrorMessage(error.response.data.message); // Set the actual error message
       } else {
-        setErrorMessage('Something went wrong!');
+        setErrorMessage('Something went wrong!'); // Fallback message
       }
     }
   };
-
   const handleOtpChange = (value: string, index: number) => {
     const newOtp = [...otp];
     newOtp[index] = value;
@@ -47,12 +47,20 @@ const Signup: React.FC = () => {
     }
   };
 
+  // Hide the error popup after 5 seconds
+  useEffect(() => {
+    if (errorMessage) {
+      const timer = setTimeout(() => {
+        setErrorMessage('');
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [errorMessage]);
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-teal-100 via-teal-200 to-blue-100">
       <div className="w-full h-screen flex items-center justify-center">
-        {/* Form Container */}
         <div className="w-full max-w-md h-full bg-white bg-opacity-60 backdrop-blur-xl rounded-3xl shadow-2xl p-8 flex flex-col justify-center">
-          
           {/* Logo */}
           <div className="flex justify-center mb-6">
             <img
@@ -63,18 +71,17 @@ const Signup: React.FC = () => {
           </div>
 
           <h2 className="text-4xl font-bold text-center text-teal-800 mb-6">Sign Up</h2>
-          
-          {/* Signup Form */}
+
           <form onSubmit={handleSignup} noValidate className="space-y-4">
             {!isOtpSent && (
               <>
                 {/* Username Input */}
                 <div>
-                  <label className="block text-lg font-medium text-gray-700">Username</label>
+                  <label className="block text-lg font-medium text-gray-700">Name</label>
                   <input
                     type="text"
                     value={username}
-                    onChange={e => setUsername(e.target.value)}
+                    onChange={(e) => setUsername(e.target.value)}
                     required
                     className="mt-2 block w-full p-3 border border-gray-300 rounded-lg bg-white text-gray-900 font-semibold shadow-md focus:outline-none focus:ring-4 focus:ring-teal-300"
                     placeholder="Enter your username"
@@ -87,10 +94,23 @@ const Signup: React.FC = () => {
                   <input
                     type="email"
                     value={email}
-                    onChange={e => setEmail(e.target.value)}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
                     className="mt-2 block w-full p-3 border border-gray-300 rounded-lg bg-white text-gray-900 font-semibold shadow-md focus:outline-none focus:ring-4 focus:ring-teal-300"
                     placeholder="Enter your email"
+                  />
+                </div>
+
+                {/* Phone Number Input */}
+                <div>
+                  <label className="block text-lg font-medium text-gray-700">Phone Number</label>
+                  <input
+                    type="text"
+                    value={phonenumber}
+                    onChange={(e) => setPhonenumber(e.target.value)}
+                    required
+                    className="mt-2 block w-full p-3 border border-gray-300 rounded-lg bg-white text-gray-900 font-semibold shadow-md focus:outline-none focus:ring-4 focus:ring-teal-300"
+                    placeholder="Enter your phone number"
                   />
                 </div>
 
@@ -100,7 +120,7 @@ const Signup: React.FC = () => {
                   <input
                     type="password"
                     value={password}
-                    onChange={e => setPassword(e.target.value)}
+                    onChange={(e) => setPassword(e.target.value)}
                     required
                     minLength={8}
                     className="mt-2 block w-full p-3 border border-gray-300 rounded-lg bg-white text-gray-900 font-semibold shadow-md focus:outline-none focus:ring-4 focus:ring-teal-300"
@@ -118,7 +138,7 @@ const Signup: React.FC = () => {
                     id={`otp-input-${index}`}
                     type="text"
                     value={digit}
-                    onChange={e => handleOtpChange(e.target.value.slice(-1), index)}
+                    onChange={(e) => handleOtpChange(e.target.value.slice(-1), index)}
                     maxLength={1}
                     className="w-12 h-12 p-2 text-center text-xl font-bold text-gray-800 bg-white border border-gray-300 rounded-md shadow-md focus:outline-none focus:ring-4 focus:ring-teal-300"
                   />
@@ -130,14 +150,13 @@ const Signup: React.FC = () => {
             <button
               type="submit"
               className="w-full bg-teal-500 text-white font-bold py-3 rounded-full shadow-lg hover:bg-teal-600 transition duration-300 ease-in-out"
-              disabled={!isOtpSent ? !username || !email || !password : otp.some(d => !d)}
+              disabled={!isOtpSent ? !username || !email || !password || !phonenumber : otp.some((d) => !d)}
             >
               {isOtpSent ? 'Verify OTP' : 'Send OTP'}
             </button>
           </form>
 
-          {/* Error and Success Messages */}
-          {errorMessage && <p className="text-red-500 text-center mt-4">{errorMessage}</p>}
+          {/* Success Message */}
           {successMessage && <p className="text-green-500 text-center mt-4">{successMessage}</p>}
 
           {/* Login Link */}
@@ -149,6 +168,13 @@ const Signup: React.FC = () => {
               </a>
             </p>
           </div>
+
+          {/* Error Message Popup */}
+          {errorMessage && (
+            <div className="fixed bottom-4 right-4 p-4 bg-red-500 text-white rounded-lg shadow-lg text-center transition-opacity duration-300 ease-in-out">
+              <p>{errorMessage}</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
