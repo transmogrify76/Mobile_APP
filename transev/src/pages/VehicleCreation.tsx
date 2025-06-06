@@ -29,7 +29,7 @@ const VehicleCreation: React.FC = () => {
       }
 
       // Make the POST request to the backend
-      const response = await axios.post('https://transev.site/admin/createav', {
+      const response = await axios.post('https://be.cms.ocpp.transev.site/admin/createav', {
         vehiclename: vehicleName,
         vehiclemodel: vehicleModel,
         vehiclelicense: vehicleLicense,
@@ -122,7 +122,7 @@ const VehicleCreation: React.FC = () => {
                 <label className="block text-lg font-medium text-gray-700">Vehicle Owner</label>
                 <input
                   type="text"
-                  value={vehicleOwner}
+                  value={vehicleOwner}  
                   onChange={e => setVehicleOwner(e.target.value)}
                   required
                   className="mt-2 block w-full p-3 border border-gray-300 rounded-lg bg-white text-gray-900 font-semibold shadow-md focus:outline-none focus:ring-4 focus:ring-teal-300"

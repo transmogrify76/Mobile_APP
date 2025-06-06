@@ -54,7 +54,7 @@ const Dashboard = () => {
     useEffect(() => {
         const fetchChargerData = async () => {
             try {
-                const response = await fetch('https://transev.site/admin/listofcharges', {
+                const response = await fetch('https://be.cms.ocpp.transev.site/admin/listofcharges', {
                     headers: {
                         apiauthkey: 'aBcD1eFgH2iJkLmNoPqRsTuVwXyZ012345678jasldjalsdjurewouroewiru'
                     }
@@ -82,7 +82,7 @@ const Dashboard = () => {
         }
 
         try {
-            const response = await fetch('https://transev.site/users/createfavorites', {
+            const response = await fetch('https://be.cms.ocpp.transev.site/users/createfavorites', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

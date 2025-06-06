@@ -20,7 +20,7 @@ const Login: React.FC = () => {
 
     const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const apiUrl = 'https://transev.site/userauth/login';
+        const apiUrl = 'https://be.cms.ocpp.transev.site/userauth/login';
         const payload = { email, password, otp: isOtpSent ? otp.join('') : undefined };
 
         try {
@@ -63,7 +63,7 @@ const Login: React.FC = () => {
     };
 
     const handleOtpVerification = async () => {
-        const apiUrl = 'https://transev.site/userauth/login';
+        const apiUrl = 'https://be.cms.ocpp.transev.site/userauth/login';
         const payload = { email, password, otp: otp.join('') };
 
         try {

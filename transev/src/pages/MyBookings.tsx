@@ -20,7 +20,7 @@ const MyBookings: React.FC = () => {
     // Fetch charger details from the API
     const fetchChargerDetails = async () => {
         try {
-            const response = await fetch('https://transev.site/admin/listofcharges', {
+            const response = await fetch('https://be.cms.ocpp.transev.site/admin/listofcharges', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -49,7 +49,7 @@ const MyBookings: React.FC = () => {
 
     const handleCreateBooking = async (e: React.FormEvent) => {
         e.preventDefault();
-        const apiUrl = 'https://transev.site/users/createbookings';
+        const apiUrl = 'https://be.cms.ocpp.transev.site/users/createbookings';
         const token = localStorage.getItem('token');
 
         if (!token) {

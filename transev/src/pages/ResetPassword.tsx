@@ -20,7 +20,7 @@ const ResetPassword: React.FC = () => {
 
     try {
       setIsLoading(true);
-      const response = await axios.post('https://transev.site/userauth/userpasswordreset', { email }, {
+      const response = await axios.post('https://be.cms.ocpp.transev.site/userauth/userpasswordreset', { email }, {
         headers: { 'apiauthkey': "aBcD1eFgH2iJkLmNoPqRsTuVwXyZ012345678jasldjalsdjurewouroewiru" }
       });
 
@@ -46,7 +46,7 @@ const ResetPassword: React.FC = () => {
 
     try {
       setIsLoading(true);
-      const response = await axios.post('https://transev.site/userauth/userpasswordreset', {
+      const response = await axios.post('https://be.cms.ocpp.transev.site/userauth/userpasswordreset', {
         email,
         otp: otp.join(''),
         newPassword

@@ -40,7 +40,7 @@ const UserProfile: React.FC = () => {
         const userid = JSON.parse(atob(token.split('.')[1])).userid; // Assuming userid is in the payload of the token
 
         const response = await axios.post(
-          'https://transev.site/users/puprofile',
+          'https://be.cms.ocpp.transev.site/users/puprofile',
           { userid: userid },
           {
             headers: {
@@ -132,7 +132,7 @@ const UserProfile: React.FC = () => {
   
     try {
       console.log('Submitting form data:', payload); // Log form data
-      const response = await axios.post('https://transev.site/users/updateprofile', JSON.stringify(payload), {
+      const response = await axios.post('https://be.cms.ocpp.transev.site/users/updateprofile', JSON.stringify(payload), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json', // Set content type to application/json

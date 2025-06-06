@@ -18,7 +18,7 @@ const HelpAndSupport: React.FC = () => {
     setErrorMessage('');
 
     try {
-      const response = await axios.post('https://transev.site/admin/has', {
+      const response = await axios.post('https://be.cms.ocpp.transev.site/admin/has', {
         name,
         email,
         phonenumber: phoneNumber,

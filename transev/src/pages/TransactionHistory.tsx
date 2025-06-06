@@ -27,7 +27,7 @@ const TransactionHistory: React.FC = () => {
     const fetchTransactions = async () => {
       try {
         const response = await axios.post<{ data: Transaction[] }>(
-          'https://transev.site/admin/transactionhistory',
+          'https://be.cms.ocpp.transev.site/admin/transactionhistory',
           { userid: 'qal0' }, // Replace with dynamic user ID
           { headers: { apiauthkey: 'aBcD1eFgH2iJkLmNoPqRsTuVwXyZ012345678jasldjalsdjurewouroewiru' } }
         );
