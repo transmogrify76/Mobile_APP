@@ -17,7 +17,6 @@ const MyBookings: React.FC = () => {
     const [bookingTimeFrom, setBookingTimeFrom] = useState('');
     const [bookingTimeTo, setBookingTimeTo] = useState('');
 
-    // Fetch charger details from the API
     const fetchChargerDetails = async () => {
         try {
             const response = await fetch('https://be.cms.ocpp.transev.site/admin/listofcharges', {
@@ -29,10 +28,10 @@ const MyBookings: React.FC = () => {
             });
             const data = await response.json();
     
-            console.log('API response:', data); // Log the entire response
+            console.log('API response:', data); 
     
             if (data && data.data) {
-                setChargerDetails(data.data); // Use the data array directly
+                setChargerDetails(data.data); 
             } else {
                 console.error('Unexpected response structure:', data);
                 // Handle the error accordingly
