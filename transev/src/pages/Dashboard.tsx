@@ -216,8 +216,18 @@ const Dashboard = () => {
             )}
 
             <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-            {isSidebarOpen && (
-                <div className="fixed inset-0 bg-black opacity-50 z-40" onClick={toggleSidebar}></div>
+{isSidebarOpen && (
+                <>
+                    <div 
+                        className="fixed inset-0 bg-black opacity-50 z-40" 
+                        onClick={toggleSidebar}
+                    />
+                    <Sidebar 
+                        isOpen={isSidebarOpen} 
+                        toggleSidebar={toggleSidebar} 
+                        className="z-50" 
+                    />
+                </>
             )}
 
             <div className="bg-white shadow-md">
