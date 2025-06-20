@@ -67,7 +67,7 @@ const HelpAndSupport: React.FC = () => {
             />
           </div>
 
-          {/* Email Input */}
+         
           <div>
             <label className="block text-lg font-medium text-gray-700">Email</label>
             <input
@@ -80,7 +80,7 @@ const HelpAndSupport: React.FC = () => {
             />
           </div>
 
-          {/* Phone Number Input */}
+          
           <div>
             <label className="block text-lg font-medium text-gray-700">Phone Number</label>
             <input
@@ -93,7 +93,7 @@ const HelpAndSupport: React.FC = () => {
             />
           </div>
 
-          {/* Message Input */}
+         
           <div>
             <label className="block text-lg font-medium text-gray-700">Your Message</label>
             <textarea
@@ -106,7 +106,7 @@ const HelpAndSupport: React.FC = () => {
             />
           </div>
 
-          {/* Submit Button */}
+          
           <button
             type="submit"
             className="w-full bg-teal-500 text-white font-bold py-3 rounded-full shadow-lg hover:bg-teal-600 transition duration-300 ease-in-out"
@@ -115,14 +115,13 @@ const HelpAndSupport: React.FC = () => {
           </button>
         </form>
 
-        {/* Success and Error Messages */}
+        
         {successMessage && <p className="text-green-500 text-center mt-4">{successMessage}</p>}
         {errorMessage && <p className="text-red-500 text-center mt-4">{errorMessage}</p>}
         
-        {/* Past Messages Button */}
         <button
           className="w-full mt-4 bg-teal-400 text-white font-bold py-3 rounded-full shadow-lg hover:bg-teal-500 transition duration-300 ease-in-out"
-          onClick={() => history.push('/viewhelp')} // Navigate to /viewhelp
+          onClick={() => history.push('/viewhelp')} 
         >
           Past Messages
         </button>

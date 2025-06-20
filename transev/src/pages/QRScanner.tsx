@@ -9,7 +9,7 @@ const QRScannerComponent: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [loading, setLoading] = useState(false);
   const [isOperative, setIsOperative] = useState(true);
 
-  const EXTERNAL_URI = "http://hal.ocpp.transev.site";
+  const EXTERNAL_URI = "https://api.ocpphal.transev.site";
   const OCPP_API_KEY = "J9YtyNYdbLD8N4qMwU2WQrr9XV2SJn4Q3qrCLEcHa8wwaZC34xhAd3RotuYdHwiB";
 
   const handleUpdate = (result: any) => {

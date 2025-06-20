@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useHistory } from 'react-router-dom'; // Import useHistory for navigation
-import { FaHome } from 'react-icons/fa'; // Import the home icon from react-icons
+import { useHistory } from 'react-router-dom'; 
+import { FaHome } from 'react-icons/fa'; 
 
 const VehicleCreation: React.FC = () => {
-  const history = useHistory(); // Create history object
+  const history = useHistory(); 
   const [vehicleName, setVehicleName] = useState<string>('');
   const [vehicleModel, setVehicleModel] = useState<string>('');
   const [vehicleLicense, setVehicleLicense] = useState<string>('');
@@ -21,14 +21,14 @@ const VehicleCreation: React.FC = () => {
 
     try {
       const apiKey = "aBcD1eFgH2iJkLmNoPqRsTuVwXyZ012345678jasldjalsdjurewouroewiru";
-      const adminuid = "yyyy"; // Hardcoded adminuid
+      const adminuid = "yyyy"; 
       
       if (!apiKey) {
         alert('API key is not defined. Please check your environment variables.');
         return;
       }
 
-      // Make the POST request to the backend
+     
       const response = await axios.post('https://be.cms.ocpp.transev.site/admin/createav', {
         vehiclename: vehicleName,
         vehiclemodel: vehicleModel,
@@ -36,7 +36,7 @@ const VehicleCreation: React.FC = () => {
         vehicleowner: vehicleOwner,
         vehicletype: vehicleType,
         vehiclecategory: vehicleCategory,
-        adminuid: adminuid, // Pass hardcoded adminuid
+        adminuid: adminuid, 
       }, {
         headers: {
           'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ const VehicleCreation: React.FC = () => {
       <div className="w-full h-screen flex items-center justify-center">
         <div className="w-full max-w-md h-[100vh] bg-white bg-opacity-60 backdrop-blur-xl rounded-3xl shadow-2xl p-8 flex flex-col justify-center overflow-hidden">
           
-          {/* Logo */}
+         
           <div className="flex justify-center mb-6">
             <img
               src="https://transev.in/wp-content/uploads/2023/07/logo-160x57.png"
@@ -70,7 +70,7 @@ const VehicleCreation: React.FC = () => {
 
           <h2 className="text-4xl font-bold text-center text-teal-800 mb-6">Create Vehicle</h2>
 
-          {/* Home Icon and Navigation */}
+          
           <div className="flex justify-between items-center mb-4">
             <button
               onClick={() => history.push('/')}
@@ -164,7 +164,7 @@ const VehicleCreation: React.FC = () => {
             </form>
           </div>
 
-          {/* Display Messages */}
+         
           {errorMessage && <p className="text-red-500 text-center mt-4">{errorMessage}</p>}
           {successMessage && <p className="text-green-500 text-center mt-4">{successMessage}</p>}
         </div>

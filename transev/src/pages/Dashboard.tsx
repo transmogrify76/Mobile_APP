@@ -1,10 +1,9 @@
-import React, { useState, useEffect, ReactNode } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaSearch, FaFilter, FaHeart, FaWallet, FaUser, FaQrcode, FaBars, FaMapMarkerAlt, FaTimes } from 'react-icons/fa'; 
 import { useHistory } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import QRScannerComponent from './QRScanner'; 
 import { jwtDecode } from 'jwt-decode'; 
-
 
 interface Charger {
     uid: string;
@@ -35,6 +34,7 @@ const Dashboard = () => {
     const [chargers, setChargers] = useState<Charger[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedCharger, setSelectedCharger] = useState<Charger | null>(null);
+    const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
 
     const toggleSidebar = () => {
         setSidebarOpen(!isSidebarOpen);
@@ -71,7 +71,6 @@ const Dashboard = () => {
                 if (response.ok) {
                     const data = await response.json();
                     
-                   
                     const mappedChargers = data.data.map((charger: any) => ({
                         uid: charger.uid,
                         chargeridentity: charger.chargeridentity,
@@ -110,7 +109,6 @@ const Dashboard = () => {
             return;
         }
 
-        
         event?.stopPropagation();
 
         try {
@@ -216,7 +214,7 @@ const Dashboard = () => {
             )}
 
             <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-{isSidebarOpen && (
+            {isSidebarOpen && (
                 <>
                     <div 
                         className="fixed inset-0 bg-black opacity-50 z-40" 
@@ -251,8 +249,18 @@ const Dashboard = () => {
 
             <div className="px-4 py-2 bg-gray-50">
                 <div className="flex justify-center my-4">
-                    <div className="mx-2 bg-blue-600 text-white rounded-full px-6 py-1 shadow-md text-center cursor-pointer">List View</div>
-                    <div className="mx-2 bg-gray-200 text-black rounded-full border border-gray-300 px-6 py-1 shadow-md text-center cursor-pointer">Map View</div>
+                    <div 
+                        className={`mx-2 ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-black border border-gray-300'} rounded-full px-6 py-1 shadow-md text-center cursor-pointer`}
+                        onClick={() => setViewMode('list')}
+                    >
+                        List View
+                    </div>
+                    <div 
+                        className={`mx-2 ${viewMode === 'map' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-black border border-gray-300'} rounded-full px-6 py-1 shadow-md text-center cursor-pointer`}
+                        onClick={() => setViewMode('map')}
+                    >
+                        Map View
+                    </div>
                 </div>
 
                 {loading ? (
@@ -260,44 +268,70 @@ const Dashboard = () => {
                         <p className="text-gray-500">Loading chargers...</p>
                     </div>
                 ) : (
-                    <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
-                        {chargers.map((charger) => (
-                            <div 
-                                key={charger.uid} 
-                                className="flex items-center bg-white rounded-lg shadow-md p-4 mb-6 cursor-pointer hover:shadow-lg transition duration-300"
-                                onClick={() => setSelectedCharger(charger)}
-                            >
-                                <img
-                                    src={charger.image_url || 'https://transev.in/wp-content/uploads/elementor/thumbs/Asian-DC-24KW-qg3zamgu8te4ak3xj8wizdb96mbcsqdsr05l5u2qao.png'}
-                                    alt={charger.name || 'Charger'}
-                                    className="w-16 h-16 rounded-lg object-cover mr-4 shadow"
-                                    onError={(e) => {
-                                        e.currentTarget.onerror = null;
-                                        e.currentTarget.src = 'https://transev.in/wp-content/uploads/elementor/thumbs/Asian-DC-24KW-qg3zamgu8te4ak3xj8wizdb96mbcsqdsr05l5u2qao.png';
-                                    }}
-                                />
-                                <div className="flex flex-col flex-grow">
-                                    <h3 className="text-lg font-semibold text-gray-800">{charger.chargeridentity}</h3>
-                                    <p className={charger.available ? 'text-green-600 text-sm font-medium' : 'text-red-600 text-sm font-medium'}>
-                                        {charger.available ? 'Available' : 'Not Available'}
-                                    </p>
-                                    <p className="text-gray-600 text-sm">Distance: ~{charger.distance} km</p>
-                                    <p className="text-gray-600 text-sm">Timings: {charger.timings}</p>
-                                    <p className="text-gray-600 text-sm">Rate: ₹{charger.rate_kwh}/kWh</p>
-                                    <p className="text-gray-600 text-sm">Hub: {charger.hubinfo?.hubname || 'N/A'}</p>
-                                </div>
-                                <div
-                                    className={`ml-auto p-2 flex items-center justify-center cursor-pointer hover:bg-red-100 transition ${charger.isFavorite ? 'text-red-500' : 'text-gray-500'}`}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleFavoriteToggle(charger);
-                                    }}
-                                >
-                                    <FaHeart className="text-xl" />
-                                </div>
+                    <>
+                       {viewMode === 'map' && (
+    <div
+        className="w-full rounded-lg overflow-hidden shadow-lg"
+        style={{
+            height: `calc(100vh - 170px)`,
+            maxHeight: 'calc(100vh - 170px)',
+        }}
+    >
+        <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3683.5341636237147!2d88.50827541536385!3d22.57175068517253!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a020afe3fa83dab%3A0xda5c16b563780319!2sShapoorji%20Pallonji%20Shukhobrishti%20Housing%20Complex!5e0!3m2!1sen!2sin!4v1718888888888!5m2!1sen!2sin"
+            width="100%"
+            height="100%"
+            style={{ border: 0 }}
+            allowFullScreen
+            loading="lazy"
+            title="Shapoorji Pallonji Shukhobrishti"
+        ></iframe>
+    </div>
+)}
+
+
+                        
+                        {viewMode === 'list' && (
+                            <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+                                {chargers.map((charger) => (
+                                    <div 
+                                        key={charger.uid} 
+                                        className="flex items-center bg-white rounded-lg shadow-md p-4 mb-6 cursor-pointer hover:shadow-lg transition duration-300"
+                                        onClick={() => setSelectedCharger(charger)}
+                                    >
+                                        <img
+                                            src={charger.image_url || 'https://transev.in/wp-content/uploads/elementor/thumbs/Asian-DC-24KW-qg3zamgu8te4ak3xj8wizdb96mbcsqdsr05l5u2qao.png'}
+                                            alt={charger.name || 'Charger'}
+                                            className="w-16 h-16 rounded-lg object-cover mr-4 shadow"
+                                            onError={(e) => {
+                                                e.currentTarget.onerror = null;
+                                                e.currentTarget.src = 'https://transev.in/wp-content/uploads/elementor/thumbs/Asian-DC-24KW-qg3zamgu8te4ak3xj8wizdb96mbcsqdsr05l5u2qao.png';
+                                            }}
+                                        />
+                                        <div className="flex flex-col flex-grow">
+                                            <h3 className="text-lg font-semibold text-gray-800">{charger.chargeridentity}</h3>
+                                            <p className={charger.available ? 'text-green-600 text-sm font-medium' : 'text-red-600 text-sm font-medium'}>
+                                                {charger.available ? 'Available' : 'Not Available'}
+                                            </p>
+                                            <p className="text-gray-600 text-sm">Distance: ~{charger.distance} km</p>
+                                            <p className="text-gray-600 text-sm">Timings: {charger.timings}</p>
+                                            <p className="text-gray-600 text-sm">Rate: ₹{charger.rate_kwh}/kWh</p>
+                                            <p className="text-gray-600 text-sm">Hub: {charger.hubinfo?.hubname || 'N/A'}</p>
+                                        </div>
+                                        <div
+                                            className={`ml-auto p-2 flex items-center justify-center cursor-pointer hover:bg-red-100 transition ${charger.isFavorite ? 'text-red-500' : 'text-gray-500'}`}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleFavoriteToggle(charger);
+                                            }}
+                                        >
+                                            <FaHeart className="text-xl" />
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
+                        )}
+                    </>
                 )}
             </div>
 
@@ -327,4 +361,4 @@ const Dashboard = () => {
     );
 };
 
-export default Dashboard; 
+export default Dashboard;
