@@ -10,11 +10,11 @@ const Login: React.FC = () => {
     const [isOtpSent, setIsOtpSent] = useState(false);
     const [message, setMessage] = useState('');
 
-    // Check if user is already logged in
+    
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (token) {
-            history.push('/dashboard'); // Redirect to dashboard if logged in
+            history.push('/dashboard'); 
         }
     }, [history]);
 

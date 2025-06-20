@@ -41,7 +41,7 @@ const QRScannerComponent: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         }),
       });
 
-      const result = await response.json();
+      const result = await response.json();  
       if (response.ok && result.status === "Accepted") {
         setIsOperative(newStatus);
         alert(`Status changed to ${newStatus ? 'Operative' : 'Inoperative'}`);
@@ -58,7 +58,6 @@ const QRScannerComponent: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   return (
     <div className="fixed inset-0 bg-[#8EAE3E] flex items-center justify-center z-50">
       <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4">
-        {/* Header */}
         <div className="flex justify-between items-center mb-5 pb-3 border-b border-gray-200">
           <div>
             <h2 className="text-2xl font-bold text-gray-800">Charger Scanner</h2>
@@ -71,14 +70,14 @@ const QRScannerComponent: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           </button>
         </div>
 
-        {/* Error */}
+       
         {error && (
           <div className="mb-4 bg-red-100 border-l-4 border-red-500 p-3 rounded">
             <p className="text-red-700 font-medium">{error}</p>
           </div>
         )}
 
-        {/* Scanner */}
+        
         <div className="relative mb-6">
           <div className="rounded-xl overflow-hidden border-4 border-gray-100 shadow-lg">
             <QrReader
@@ -92,7 +91,7 @@ const QRScannerComponent: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           </div>
         </div>
 
-        {/* Scanned Info */}
+        
         {scannedData && (
           <div className="bg-green-50 rounded-lg p-3 flex items-center mb-4">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-600 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -102,7 +101,7 @@ const QRScannerComponent: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           </div>
         )}
 
-        {/* Manual Input */}
+        
         <div className="mt-4 flex justify-center">
           <button
             className="flex items-center text-gray-500 hover:text-gray-800 text-sm"
@@ -117,7 +116,7 @@ const QRScannerComponent: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         </div>
       </div>
 
-      {/* Modal */}
+     
       <Modal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}

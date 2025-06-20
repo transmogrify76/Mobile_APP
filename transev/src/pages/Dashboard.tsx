@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { FaSearch, FaFilter, FaHeart, FaWallet, FaUser, FaQrcode, FaBars, FaMapMarkerAlt, FaTimes } from 'react-icons/fa'; 
+import { FaSearch, FaFilter, FaHeart, FaWallet, FaUser, FaQrcode, FaBars, FaMapMarkerAlt, FaTimes } from 'react-icons/fa';
 import { useHistory } from 'react-router-dom';
 import Sidebar from './Sidebar';
-import QRScannerComponent from './QRScanner'; 
-import { jwtDecode } from 'jwt-decode'; 
+import QRScannerComponent from './QRScanner';
+import { jwtDecode } from 'jwt-decode';
 
 interface Charger {
     uid: string;
@@ -48,8 +48,8 @@ const Dashboard = () => {
         const token = localStorage.getItem('token');
         if (token) {
             try {
-                const decodedToken: any = jwtDecode(token); 
-                return decodedToken.userid; 
+                const decodedToken: any = jwtDecode(token);
+                return decodedToken.userid;
             } catch (error) {
                 console.error('Error decoding token:', error);
                 return null;
@@ -70,15 +70,15 @@ const Dashboard = () => {
                 });
                 if (response.ok) {
                     const data = await response.json();
-                    
+
                     const mappedChargers = data.data.map((charger: any) => ({
                         uid: charger.uid,
                         chargeridentity: charger.chargeridentity,
                         id: charger.id,
                         name: charger.ChargerName,
                         image_url: charger.charger_image,
-                        available: true, 
-                        distance: Math.floor(Math.random() * 10) + 1, 
+                        available: true,
+                        distance: Math.floor(Math.random() * 10) + 1,
                         timings: charger.twenty_four_seven_open_status === 'yes' ? '24/7' : 'Specific hours',
                         rate_fixed: 0,
                         rate_kwh: charger.hubinfo ? parseFloat(charger.hubinfo.hubtariff) : 0,
@@ -86,10 +86,10 @@ const Dashboard = () => {
                         hubinfo: charger.hubinfo,
                         full_address: charger.full_address,
                         twenty_four_seven_open_status: charger.twenty_four_seven_open_status,
-                        isFavorite: false 
+                        isFavorite: false
                     }));
-                    
-                    setChargers(mappedChargers);  
+
+                    setChargers(mappedChargers);
                 } else {
                     console.error('Failed to fetch charger data');
                 }
@@ -119,16 +119,16 @@ const Dashboard = () => {
                     apiauthkey: 'aBcD1eFgH2iJkLmNoPqRsTuVwXyZ012345678jasldjalsdjurewouroewiru'
                 },
                 body: JSON.stringify({
-                    chargeruid: charger.uid, 
-                    useruid: userid, 
-                    isfavorite: !charger.isFavorite 
+                    chargeruid: charger.uid,
+                    useruid: userid,
+                    isfavorite: !charger.isFavorite
                 })
             });
 
             if (response.ok) {
                 const data = await response.json();
-                setChargers((prevChargers) => 
-                    prevChargers.map((ch) => 
+                setChargers((prevChargers) =>
+                    prevChargers.map((ch) =>
                         ch.uid === charger.uid ? { ...ch, isFavorite: !ch.isFavorite } : ch
                     )
                 );
@@ -150,52 +150,52 @@ const Dashboard = () => {
                             <h2 className="text-xl font-bold text-gray-800">
                                 {selectedCharger.chargeridentity}
                             </h2>
-                            <button 
+                            <button
                                 onClick={() => setSelectedCharger(null)}
                                 className="text-gray-500 hover:text-gray-700 text-2xl"
                             >
                                 <FaTimes />
                             </button>
                         </div>
-                        
+
                         <div className="p-5">
                             <div className="flex items-center mb-4">
-                                <span 
+                                <span
                                     className={`inline-block w-3 h-3 rounded-full mr-2 ${selectedCharger.available ? 'bg-green-500' : 'bg-red-500'}`}
                                 ></span>
                                 <span className={selectedCharger.available ? 'text-green-600 font-medium' : 'text-red-600 font-medium'}>
                                     {selectedCharger.available ? 'Available Now' : 'Currently Unavailable'}
                                 </span>
                             </div>
-                            
+
                             <div className="space-y-3">
                                 <p className="flex items-center text-gray-600">
                                     <FaMapMarkerAlt className="mr-3 text-gray-400" />
                                     <span>Distance: ~{selectedCharger.distance} km</span>
                                 </p>
-                                
+
                                 <p className="flex items-start text-gray-600">
                                     <span className="mr-3">⏱️</span>
                                     <span>Timings: {selectedCharger.timings}</span>
                                 </p>
-                                
+
                                 <p className="flex items-start text-gray-600">
                                     <span className="mr-3">📍</span>
                                     <span>{selectedCharger.full_address || 'Address not available'}</span>
                                 </p>
-                                
+
                                 <p className="flex items-start text-gray-600">
                                     <span className="mr-3">🏢</span>
                                     <span>Hub: {selectedCharger.hubinfo?.hubname || 'N/A'}</span>
                                 </p>
-                                
+
                                 <p className="flex items-start text-gray-600">
                                     <span className="mr-3">💰</span>
                                     <span>Rate: ₹{selectedCharger.rate_kwh}/kWh</span>
                                 </p>
                             </div>
                         </div>
-                        
+
                         <div className="p-5 border-t">
                             <button
                                 onClick={() => {
@@ -216,14 +216,14 @@ const Dashboard = () => {
             <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
             {isSidebarOpen && (
                 <>
-                    <div 
-                        className="fixed inset-0 bg-black opacity-50 z-40" 
+                    <div
+                        className="fixed inset-0 bg-black opacity-50 z-40"
                         onClick={toggleSidebar}
                     />
-                    <Sidebar 
-                        isOpen={isSidebarOpen} 
-                        toggleSidebar={toggleSidebar} 
-                        className="z-50" 
+                    <Sidebar
+                        isOpen={isSidebarOpen}
+                        toggleSidebar={toggleSidebar}
+                        className="z-50"
                     />
                 </>
             )}
@@ -249,13 +249,13 @@ const Dashboard = () => {
 
             <div className="px-4 py-2 bg-gray-50">
                 <div className="flex justify-center my-4">
-                    <div 
+                    <div
                         className={`mx-2 ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-black border border-gray-300'} rounded-full px-6 py-1 shadow-md text-center cursor-pointer`}
                         onClick={() => setViewMode('list')}
                     >
                         List View
                     </div>
-                    <div 
+                    <div
                         className={`mx-2 ${viewMode === 'map' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-black border border-gray-300'} rounded-full px-6 py-1 shadow-md text-center cursor-pointer`}
                         onClick={() => setViewMode('map')}
                     >
@@ -269,33 +269,33 @@ const Dashboard = () => {
                     </div>
                 ) : (
                     <>
-                       {viewMode === 'map' && (
-    <div
-        className="w-full rounded-lg overflow-hidden shadow-lg"
-        style={{
-            height: `calc(100vh - 170px)`,
-            maxHeight: 'calc(100vh - 170px)',
-        }}
-    >
-        <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3683.5341636237147!2d88.50827541536385!3d22.57175068517253!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a020afe3fa83dab%3A0xda5c16b563780319!2sShapoorji%20Pallonji%20Shukhobrishti%20Housing%20Complex!5e0!3m2!1sen!2sin!4v1718888888888!5m2!1sen!2sin"
-            width="100%"
-            height="100%"
-            style={{ border: 0 }}
-            allowFullScreen
-            loading="lazy"
-            title="Shapoorji Pallonji Shukhobrishti"
-        ></iframe>
-    </div>
-)}
+                        {viewMode === 'map' && (
+                            <div
+                                className="w-full rounded-lg overflow-hidden shadow-lg"
+                                style={{
+                                    height: `calc(100vh - 170px)`,
+                                    maxHeight: 'calc(100vh - 170px)',
+                                }}
+                            >
+                                <iframe
+                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3683.5341636237147!2d88.50827541536385!3d22.57175068517253!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a020afe3fa83dab%3A0xda5c16b563780319!2sShapoorji%20Pallonji%20Shukhobrishti%20Housing%20Complex!5e0!3m2!1sen!2sin!4v1718888888888!5m2!1sen!2sin"
+                                    width="100%"
+                                    height="100%"
+                                    style={{ border: 0 }}
+                                    allowFullScreen
+                                    loading="lazy"
+                                    title="Shapoorji Pallonji Shukhobrishti"
+                                ></iframe>
+                            </div>
+                        )}
 
 
-                        
+
                         {viewMode === 'list' && (
                             <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
                                 {chargers.map((charger) => (
-                                    <div 
-                                        key={charger.uid} 
+                                    <div
+                                        key={charger.uid}
                                         className="flex items-center bg-white rounded-lg shadow-md p-4 mb-6 cursor-pointer hover:shadow-lg transition duration-300"
                                         onClick={() => setSelectedCharger(charger)}
                                     >
