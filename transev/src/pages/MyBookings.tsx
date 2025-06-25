@@ -34,7 +34,7 @@ const MyBookings: React.FC = () => {
                 setChargerDetails(data.data); 
             } else {
                 console.error('Unexpected response structure:', data);
-                // Handle the error accordingly
+                
             }
         } catch (error) {
             console.error('Error fetching charger details:', error);
@@ -78,7 +78,7 @@ const MyBookings: React.FC = () => {
             setBookingTimeFrom('');
             setBookingTimeTo('');
         } catch (error) {
-            console.error(error); // Log the error for debugging
+            console.error(error); 
             if (axios.isAxiosError(error)) {
                 setMessage(error.response?.data?.message || 'Failed to create booking.');
             } else {
@@ -86,11 +86,11 @@ const MyBookings: React.FC = () => {
             }
         }
     };
-
+   
     return (
         <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-teal-100 via-teal-200 to-blue-100">
             <div className="w-full max-w-lg bg-white bg-opacity-60 backdrop-blur-xl rounded-3xl shadow-2xl p-8 relative">
-                <button
+                <button 
                     onClick={() => history.push('/dashboard')}
                     className="absolute top-4 left-4 p-2 bg-teal-500 rounded-full shadow-md hover:bg-teal-600 transition duration-300"
                 >
