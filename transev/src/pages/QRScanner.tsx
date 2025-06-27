@@ -71,7 +71,6 @@ const QRScannerComponent: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-teal-100 via-teal-200 to-blue-100 flex items-center justify-center z-50">
       <div className="bg-white bg-opacity-80 backdrop-blur-xl rounded-3xl shadow-2xl p-6 w-full max-w-md mx-4">
-        {/* Header */}
         <div className="flex justify-between items-center mb-5 pb-3 border-b border-gray-200">
           <div>
             <h2 className="text-2xl font-bold text-teal-800">Scan Charger QR</h2>
@@ -84,14 +83,12 @@ const QRScannerComponent: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           </button>
         </div>
 
-        {/* Error Display */}
         {error && (
           <div className="mb-4 bg-red-100 border-l-4 border-red-500 p-3 rounded">
             <p className="text-red-700 font-medium">{error}</p>
           </div>
         )}
-
-        {/* QR Reader */}
+       
         <div className="relative mb-6">
           <div className="rounded-xl overflow-hidden border-4 border-gray-200 shadow-md">
             <QrReader delay={300} onError={handleError} onUpdate={handleUpdate} />
@@ -99,22 +96,41 @@ const QRScannerComponent: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           <div className="mt-3 text-center text-gray-600 text-sm">Align QR code within the frame</div>
         </div>
 
-        {/* Charger Info */}
         {scannedData && (
-          <div className="bg-green-50 border border-green-300 rounded-lg p-3 flex items-center mb-4 text-sm text-green-800 shadow">
-            <svg className="h-5 w-5 text-green-600 mr-2" viewBox="0 0 20 20" fill="currentColor">
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                clipRule="evenodd"
-              />
-            </svg>
-            <p className="truncate">Charger Found: <strong>{scannedData?.ChargerName}</strong> ({scannedData?.uid})</p>
+          <div className="bg-green-50 border border-green-300 rounded-lg p-4 mb-4 text-sm text-green-800 shadow">
+            <div className="flex items-center mb-2">
+              <svg className="h-5 w-5 text-green-600 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clipRule="evenodd"
+                />
+              </svg>
+
+            
+              <span><strong>Charger Found:</strong> {scannedData?.ChargerName} ({scannedData?.uid})</span>
+            </div>
+            <ul className="list-disc pl-6 text-gray-800">
+              {scannedData?.Chargertype && (
+                <li><strong>Type:</strong> {scannedData.Chargertype}</li>
+              )}
+              {scannedData?.Total_Capacity && (
+                <li><strong>Total Capacity:</strong> {scannedData.Total_Capacity}</li>
+              )}
+              {scannedData?.Connector_type && (
+                <li><strong>Connector Type:</strong> {scannedData.Connector_type}</li>
+              )}
+              {scannedData?.charger_use_type && (
+                <li><strong>Usage:</strong> {scannedData.charger_use_type}</li>
+              )}
+              {scannedData?.full_address && (
+                <li><strong>Address:</strong> {scannedData.full_address}</li>
+              )}
+            </ul>
           </div>
         )}
       </div>
-
-      {/* Modal with connector select + charger control */}
+ 
       <Modal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}

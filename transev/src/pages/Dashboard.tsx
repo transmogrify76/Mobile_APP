@@ -25,6 +25,8 @@ interface Charger {
     };
     twenty_four_seven_open_status?: string;
     full_address?: string;
+    total_capacity: string;
+    charger_type: string;
 }
 
 const Dashboard = () => {
@@ -86,7 +88,9 @@ const Dashboard = () => {
                         hubinfo: charger.hubinfo,
                         full_address: charger.full_address,
                         twenty_four_seven_open_status: charger.twenty_four_seven_open_status,
-                        isFavorite: false
+                        isFavorite: false,
+                        total_capacity: charger.Total_Capacity,
+                        charger_type: charger.Chargertype
                     }));
 
                     setChargers(mappedChargers);
@@ -177,6 +181,16 @@ const Dashboard = () => {
                                 <p className="flex items-start text-gray-600">
                                     <span className="mr-3">⏱️</span>
                                     <span>Timings: {selectedCharger.timings}</span>
+                                </p>
+
+                                <p className="flex items-start text-gray-600">
+                                    <span className="mr-3">⚡</span>
+                                    <span>Capacity: {selectedCharger.total_capacity}</span>
+                                </p>
+
+                                <p className="flex items-start text-gray-600">
+                                    <span className="mr-3">🔌</span>
+                                    <span>Type: {selectedCharger.charger_type}</span>
                                 </p>
 
                                 <p className="flex items-start text-gray-600">
@@ -289,8 +303,6 @@ const Dashboard = () => {
                             </div>
                         )}
 
-
-
                         {viewMode === 'list' && (
                             <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
                                 {chargers.map((charger) => (
@@ -314,6 +326,8 @@ const Dashboard = () => {
                                                 {charger.available ? 'Available' : 'Not Available'}
                                             </p>
                                             <p className="text-gray-600 text-sm">Distance: ~{charger.distance} km</p>
+                                            <p className="text-gray-600 text-sm">Capacity: {charger.total_capacity}</p>
+                                            <p className="text-gray-600 text-sm">Type: {charger.charger_type}</p>
                                             <p className="text-gray-600 text-sm">Timings: {charger.timings}</p>
                                             <p className="text-gray-600 text-sm">Rate: ₹{charger.rate_kwh}/kWh</p>
                                             <p className="text-gray-600 text-sm">Hub: {charger.hubinfo?.hubname || 'N/A'}</p>
@@ -361,4 +375,4 @@ const Dashboard = () => {
     );
 };
 
-export default Dashboard;
+export default Dashboard; 

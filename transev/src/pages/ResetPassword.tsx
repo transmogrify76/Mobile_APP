@@ -1,23 +1,23 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useHistory } from 'react-router-dom'; // Import useHistory
+import { useHistory } from 'react-router-dom'; 
 
 const ResetPassword: React.FC = () => {
-  const history = useHistory(); // Initialize useHistory
+  const history = useHistory(); 
   const [email, setEmail] = useState('');
-  const [otp, setOtp] = useState<string[]>(Array(6).fill('')); // 6-digit OTP input
+  const [otp, setOtp] = useState<string[]>(Array(6).fill('')); 
   const [newPassword, setNewPassword] = useState('');
-  const [step, setStep] = useState(1); // Step 1: Request OTP, Step 2: Reset Password
+  const [step, setStep] = useState(1); 
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Handle OTP Request
+    
   const handleOtpRequest = async () => {
     if (!email) {
       setMessage('Please enter your email');
       return;
     }
-
+          
     try {
       setIsLoading(true);
       const response = await axios.post('https://be.cms.ocpp.transev.site/userauth/userpasswordreset', { email }, {
