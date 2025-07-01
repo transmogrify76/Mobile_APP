@@ -1,24 +1,24 @@
 import React, { useState } from 'react';
-import { IonIcon } from '@ionic/react'; // Import IonIcon for the home icon
-import { home } from 'ionicons/icons'; // Import the home icon
-import { useHistory } from 'react-router-dom'; // Import useHistory for navigation
+import { IonIcon } from '@ionic/react'; 
+import { home } from 'ionicons/icons'; 
+import { useHistory } from 'react-router-dom'; 
 
-declare var Razorpay: any; // Declare Razorpay
+declare var Razorpay: any; 
 
 const Wallet: React.FC = () => {
-  const history = useHistory(); // Initialize useHistory
-  const [balance, setBalance] = useState<number>(0); // Initial balance set to 0
-  const [selectedAmount, setSelectedAmount] = useState<number>(0); // To track selected amount
+  const history = useHistory(); 
+  const [balance, setBalance] = useState<number>(0); 
+  const [selectedAmount, setSelectedAmount] = useState<number>(0); 
 
   const addMoney = (amount: number): void => {
-    setSelectedAmount(amount); // Set the selected amount
+    setSelectedAmount(amount); 
   };
 
   const payNow = (): void => {
-    const paymentAmount = selectedAmount * 100; // Convert amount to paise
+    const paymentAmount = selectedAmount * 100; 
 
     const options = {
-      key: 'rzp_test_ySKlMUoDlIHU1z', // Your Razorpay key
+      key: 'rzp_test_nzmqxQYhvCH9rD', // Your Razorpay key
       amount: paymentAmount, // Amount in paise
       currency: 'INR',
       name: 'Your Company Name', // Your company name
@@ -40,14 +40,14 @@ const Wallet: React.FC = () => {
     };
 
     const rzp1 = new Razorpay(options);
-    rzp1.open(); // Open the Razorpay modal
+    rzp1.open();
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-teal-100 via-teal-200 to-blue-100 relative">
       <div className="w-full h-screen flex items-center justify-center">
         <div className="w-full max-w-md bg-white bg-opacity-60 backdrop-blur-xl rounded-3xl shadow-2xl p-8 flex flex-col justify-between h-full">
-          {/* Home Icon Button */}
+         
           <button
             className="absolute top-4 left-4 p-2 rounded-full bg-teal-500 text-white shadow-lg hover:bg-teal-600 transition duration-300"
             onClick={() => history.push('/dashboard')}

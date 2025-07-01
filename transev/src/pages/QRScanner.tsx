@@ -140,6 +140,6 @@ const QRScannerComponent: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       />
     </div>
   );
-};
+};  
 
 export default QRScannerComponent;
