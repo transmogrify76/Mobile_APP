@@ -142,8 +142,8 @@ const Wallet: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f9fafa] p-4 text-sm">
-      <div className="max-w-md mx-auto space-y-4">
+    <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-blue-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-white/80 backdrop-blur-md rounded-3xl shadow-xl p-6 space-y-4">
         {/* Top Header */}
         <div className="flex justify-between items-center">
           <h1 className="text-xl font-semibold text-teal-700">My Wallet</h1>
