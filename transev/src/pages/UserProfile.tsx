@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { IonIcon } from '@ionic/react'; // Import IonIcon for the home icon
-import { home } from 'ionicons/icons'; // Import the home icon
-import { useHistory } from 'react-router-dom'; // Import useHistory for navigation
+import { IonIcon } from '@ionic/react'; 
+import { home } from 'ionicons/icons'; 
+import { useHistory } from 'react-router-dom'; 
 
 interface UserData {
   name: string;
   email: string;
-  phone: string | null; // null allowed since phone number can be null
-  profilePicture?: string | null; // Added profile picture field
+  phone: string | null; 
+  profilePicture?: string | null; 
 }
 
 const UserProfile: React.FC = () => {
-  const history = useHistory(); // Initialize useHistory
+  const history = useHistory(); 
   const [userData, setUserData] = useState<UserData>({
     name: '',
     email: '',
@@ -25,8 +25,7 @@ const UserProfile: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-  const [file, setFile] = useState<File | null>(null); // State to hold the uploaded file
-
+  const [file, setFile] = useState<File | null>(null); 
   useEffect(() => {
     const fetchProfileDetails = async () => {
       setLoading(true);
@@ -37,7 +36,7 @@ const UserProfile: React.FC = () => {
           return;
         }
 
-        const userid = JSON.parse(atob(token.split('.')[1])).userid; // Assuming userid is in the payload of the token
+        const userid = JSON.parse(atob(token.split('.')[1])).userid;
 
         const response = await axios.post(
           'https://be.cms.ocpp.transev.site/users/puprofile',
@@ -52,19 +51,18 @@ const UserProfile: React.FC = () => {
 
         if (response.data && response.data.data) {
           const { username, phonenumber, email, profilepicture } = response.data.data;
-          const { pfimage } = response.data; // Get pfimage from the response
-
+          const { pfimage } = response.data; 
           setUserData({
-            name: username || '', // Map username to name
+            name: username || '', 
             email: email || '',
-            phone: phonenumber || null, // Map phonenumber to phone
-            profilePicture: pfimage || null, // Map pfimage to profile picture
+            phone: phonenumber || null, 
+            profilePicture: pfimage || null, 
           });
           setFormData({
             name: username || '',
             email: email || '',
             phone: phonenumber || null,
-            profilePicture: pfimage || null, // Map pfimage to form data
+            profilePicture: pfimage || null, 
           });
           setSuccessMessage('Profile details fetched successfully!');
         } else {
@@ -106,18 +104,18 @@ const UserProfile: React.FC = () => {
       return;
     }
   
-    // Extract user ID from the token
+    
     const decodedToken = JSON.parse(atob(token.split('.')[1]));
-    const userid = decodedToken.userid; // Assuming userid is in the payload of the token
-    console.log('User ID:', userid); // Log the extracted user ID
+    const userid = decodedToken.userid; 
+    console.log('User ID:', userid); 
   
-    // Check if userid is defined
+    
     if (!userid) {
       setErrorMessage('User ID is undefined.');
       return;
     }
   
-    // Create the payload object
+  
     const payload = {
       uid: userid,
       username: formData.name,
@@ -127,21 +125,21 @@ const UserProfile: React.FC = () => {
         const reader = new FileReader();
         reader.onloadend = () => resolve(reader.result as string);
         reader.readAsDataURL(file);
-      }) : null, // Convert file to base64 if it exists
+      }) : null, 
     };
   
     try {
-      console.log('Submitting form data:', payload); // Log form data
+      console.log('Submitting form data:', payload); 
       const response = await axios.post('https://be.cms.ocpp.transev.site/users/updateprofile', JSON.stringify(payload), {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json', // Set content type to application/json
+          'Content-Type': 'application/json', 
           'apiauthkey': 'aBcD1eFgH2iJkLmNoPqRsTuVwXyZ012345678jasldjalsdjurewouroewiru',
         },
       });
   
       if (response.data) {
-        // Update local state with the response data
+        
         setUserData((prevState) => ({
           ...prevState,
           name: formData.name,
@@ -171,14 +169,14 @@ const UserProfile: React.FC = () => {
   const handleCancelClick = () => {
     setFormData(userData);
     setEditMode(false);
-    setFile(null); // Reset file input
+    setFile(null); 
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-teal-100 via-teal-200 to-blue-100">
       <div className="w-full h-screen flex items-center justify-center">
         <div className="w-full max-w-md h-full bg-white bg-opacity-60 backdrop-blur-xl rounded-3xl shadow-2xl p-8 flex flex-col justify-center relative">
-          {/* Home Icon Button */}
+          
           <button
             className="absolute top-4 left-4 p-2 rounded-full bg-teal-500 text-white shadow-lg hover:bg-teal-600 transition duration-300"
             onClick={() => history.push('/dashboard')}

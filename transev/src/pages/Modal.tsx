@@ -6,7 +6,7 @@ interface ModalProps {
   chargerId: string;
   connectors: string[];
   userid: string | null;
-}
+}  
 
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, chargerId, connectors, userid }) => {
   const [selectedConnector, setSelectedConnector] = useState<string>('');

@@ -56,29 +56,29 @@ const ResetPassword: React.FC = () => {
 
       if (response.status === 200) {
         setMessage('Password reset successfully. You can now log in.');
-        // Navigate to the login page
+        
         setTimeout(() => {
-          history.push('/login'); // Redirect after a short delay
-        }, 2000); // Wait 2 seconds before redirecting
+          history.push('/login'); 
+        }, 2000); 
       } else {
         setMessage(response.data.message);
       }
     } catch (error) {
-      const err = error as Error;  // Type assertion to `Error`
+      const err = error as Error; 
       console.error(err.message);
-      setMessage('Failed to reset password. Please try again.'); // Show error message
+      setMessage('Failed to reset password. Please try again.'); 
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Handle OTP Input Change
+  
   const handleOtpChange = (value: string, index: number) => {
     const newOtp = [...otp];
-    newOtp[index] = value.slice(-1); // Allow only one digit per input
+    newOtp[index] = value.slice(-1); 
     setOtp(newOtp);
 
-    // Automatically move to the next input if available
+    
     if (value && index < 5) {
       const nextInput = document.getElementById(`otp-input-${index + 1}`);
       nextInput?.focus();

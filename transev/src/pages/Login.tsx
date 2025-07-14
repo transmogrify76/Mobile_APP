@@ -63,9 +63,9 @@ const Login: React.FC = () => {
     };
 
     const handleOtpVerification = async () => {
-        const apiUrl = 'https://be.cms.ocpp.transev.site/userauth/login';
+        const apiUrl = 'https://be.cms.ocpp.transev.site/userauth/login';        
         const payload = { email, password, otp: otp.join('') };
-
+        
         try {
             const response = await axios.post(apiUrl, payload, {
                 headers: {
@@ -73,7 +73,7 @@ const Login: React.FC = () => {
                 }
             });
 
-            setMessage(response.data.message);
+            setMessage(response.data.message);   
 
             if (response.status === 200) {
                 const { token } = response.data;
