@@ -36,7 +36,8 @@
     "react-qr-barcode-scanner": "^2.0.0",
     "react-qr-scanner": "^1.0.0-alpha.11",
     "react-router": "^5.3.4",
-    "react-router-dom": "^5.3.4"
+    "react-router-dom": "^5.3.4",
+    "react-toastify": "^11.0.5"
   },
   "devDependencies": {
     "@capacitor/cli": "6.1.2",

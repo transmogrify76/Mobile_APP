@@ -312,12 +312,12 @@ const Dashboard = () => {
                                         onClick={() => setSelectedCharger(charger)}
                                     >
                                         <img
-                                            src={charger.image_url || 'https://transev.in/wp-content/uploads/elementor/thumbs/Asian-DC-24KW-qg3zamgu8te4ak3xj8wizdb96mbcsqdsr05l5u2qao.png'}
+                                            src={charger.image_url || 'https://transev.in/assets/DC04W-BZzo5Frn.png'}
                                             alt={charger.name || 'Charger'}
                                             className="w-16 h-16 rounded-lg object-cover mr-4 shadow"
                                             onError={(e) => {
                                                 e.currentTarget.onerror = null;
-                                                e.currentTarget.src = 'https://transev.in/wp-content/uploads/elementor/thumbs/Asian-DC-24KW-qg3zamgu8te4ak3xj8wizdb96mbcsqdsr05l5u2qao.png';
+                                                e.currentTarget.src = 'https://transev.in/assets/DC04W-BZzo5Frn.png';
                                             }}
                                         />
                                         <div className="flex flex-col flex-grow">
