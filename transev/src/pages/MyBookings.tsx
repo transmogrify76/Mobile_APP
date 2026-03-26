@@ -104,7 +104,7 @@ const MyBookings: React.FC = () => {
                 <form onSubmit={handleCreateBooking}>
                     <div className="mb-4">
                         <label className="block text-teal-700 text-sm font-bold mb-2" htmlFor="chargerUID">
-                            Charger UID
+                            Charger Name
                         </label>
                         <select
                             id="chargerUID"

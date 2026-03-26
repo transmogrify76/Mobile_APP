@@ -10,7 +10,7 @@ declare global {
     Razorpay: any;
   }
 }
-
+ 
 interface DecodedToken {
   userid: string;
   userwalletid: string;

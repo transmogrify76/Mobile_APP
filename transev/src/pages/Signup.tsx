@@ -64,7 +64,7 @@ const Signup: React.FC = () => {
           {/* Logo */}
           <div className="flex justify-center mb-6">
             <img
-              src="https://transev.in/wp-content/uploads/2023/07/logo-160x57.png"
+              src="https://transev.in/assets/up-B0GM0qzi.png"
               alt="Logo"
               className="h-14 w-auto"
             />
@@ -146,7 +146,6 @@ const Signup: React.FC = () => {
               </div>
             )}
 
-            {/* Submit Button */}
             <button
               type="submit"
               className="w-full bg-teal-500 text-white font-bold py-3 rounded-full shadow-lg hover:bg-teal-600 transition duration-300 ease-in-out"
@@ -169,7 +168,6 @@ const Signup: React.FC = () => {
             </p>
           </div>
 
-          {/* Error Message Popup */}
           {errorMessage && (
             <div className="fixed bottom-4 right-4 p-4 bg-red-500 text-white rounded-lg shadow-lg text-center transition-opacity duration-300 ease-in-out">
               <p>{errorMessage}</p>

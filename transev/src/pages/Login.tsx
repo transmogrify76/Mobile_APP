@@ -95,7 +95,7 @@ const Login: React.FC = () => {
                 <div className="w-full max-w-md h-full bg-white bg-opacity-60 backdrop-blur-xl rounded-3xl shadow-2xl p-8 flex flex-col justify-center">
                     <div className="flex justify-center mb-6">
                         <img
-                            src="https://transev.in/wp-content/uploads/2023/07/logo-160x57.png"
+                            src="https://transev.in/assets/up-B0GM0qzi.png"
                             alt="Logo"
                             className="h-14 w-auto"
                         />

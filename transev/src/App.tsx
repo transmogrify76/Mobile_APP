@@ -17,6 +17,8 @@ import DisputeForm from './pages/DisputeForm';
 import ResetPassword from './pages/ResetPassword';
 import TransactionHistory from './pages/TransactionHistory';
 import MyBookingsList from './pages/MyBookingsList';
+import BillList from './pages/BillList';
+import BillDetail from './pages/BillDetail';
 
 
 const App: React.FC = () => (
@@ -40,6 +42,8 @@ const App: React.FC = () => (
         <Route path="/reset" component={ResetPassword} exact={true} />
         <Route path="/transaction" component={TransactionHistory} exact={true} />
         <Route path="/mybookings" component={MyBookingsList} exact={true} />
+        <Route path="/bills" exact component={BillList} />
+        <Route path="/bill-detail/:billid" component={BillDetail} />
 
 
 
