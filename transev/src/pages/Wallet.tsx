@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { IonIcon } from '@ionic/react';
-import { home } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import { toast } from 'react-toastify';
+import { FaHome, FaWallet, FaRupeeSign, FaHistory, FaArrowUp, FaSpinner } from 'react-icons/fa';
 
 declare global {
   interface Window {
@@ -30,6 +29,7 @@ const Wallet: React.FC = () => {
   const [selectedAmount, setSelectedAmount] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [rechargeHistory, setRechargeHistory] = useState<RechargeRecord[]>([]);
+  const [isFetchingHistory, setIsFetchingHistory] = useState(false);
 
   const rooturi = "https://be.cms.ocpp.transev.site";
   const apikey = "aBcD1eFgH2iJkLmNoPqRsTuVwXyZ012345678jasldjalsdjurewouroewiru";
@@ -58,6 +58,7 @@ const Wallet: React.FC = () => {
   };
 
   const fetchRechargeHistory = async () => {
+    setIsFetchingHistory(true);
     try {
       const res = await fetch(`${rooturi}/users/userwalletrechargehistory`, {
         method: 'POST',
@@ -71,6 +72,8 @@ const Wallet: React.FC = () => {
       if (res.ok) setRechargeHistory(data.data);
     } catch {
       toast.error('Failed to load history');
+    } finally {
+      setIsFetchingHistory(false);
     }
   };
 
@@ -110,6 +113,8 @@ const Wallet: React.FC = () => {
         amount: actualprice * 100,
         currency: 'INR',
         name: 'TransEV',
+        description: 'Wallet Recharge',
+        image: 'https://transev.in/assets/up-B0GM0qzi.png',
         order_id: orderId,
         handler: async (response: any) => {
           await fetch(`${rooturi}/admin/verifypayment`, {
@@ -126,7 +131,7 @@ const Wallet: React.FC = () => {
             }),
           });
 
-          toast.success('Recharged!');
+          toast.success('Recharge successful!');
           fetchBalance();
           fetchRechargeHistory();
         },
@@ -135,87 +140,148 @@ const Wallet: React.FC = () => {
 
       rzp.open();
     } catch (err: any) {
-      toast.error('Recharge failed');
+      toast.error('Recharge failed. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  };
+
+  const formatTime = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const totalRecharged = rechargeHistory.reduce(
+    (sum, rec) => sum + parseFloat(rec.addedbalance),
+    0
+  );
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-blue-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white/80 backdrop-blur-md rounded-3xl shadow-xl p-6 space-y-4">
-        {/* Top Header */}
-        <div className="flex justify-between items-center">
-          <h1 className="text-xl font-semibold text-teal-700">My Wallet</h1>
+    // Force scrollable container: full viewport height, vertical scroll
+    <div className="h-screen overflow-y-auto bg-gradient-to-br from-teal-50 via-white to-blue-50 p-4">
+      <div className="max-w-md mx-auto pb-4">
+        {/* Home Button */}
+        <div className="mb-4">
           <button
-            className="text-white bg-teal-600 p-2 rounded-full"
             onClick={() => history.push('/dashboard')}
+            className="p-3 bg-teal-600 rounded-full shadow-lg hover:bg-teal-700 transition-all duration-200"
           >
-            <IonIcon icon={home} />
+            <FaHome className="text-white text-xl" />
           </button>
         </div>
 
-        {/* Balance Card */}
-        <div className="bg-white rounded-xl px-6 py-4 shadow text-center">
-          <p className="text-gray-500 text-xs mb-1">Available Balance</p>
-          <p className="text-3xl font-bold text-teal-800">₹ {balance.toFixed(2)}</p>
-        </div>
-
-        {/* Recharge Amount Buttons */}
-        <div>
-          <p className="mb-2 text-gray-600 font-medium">Recharge</p>
-          <div className="grid grid-cols-4 gap-2 mb-3">
-            {[100, 200, 500, 1000].map(amount => (
-              <button
-                key={amount}
-                onClick={() => setSelectedAmount(amount)}
-                className={`py-2 rounded-full text-xs font-semibold ${
-                  selectedAmount === amount
-                    ? 'bg-teal-700 text-white'
-                    : 'bg-gray-200 text-gray-800'
-                }`}
-              >
-                ₹{amount}
-              </button>
-            ))}
-          </div>
-          <button
-            onClick={handlePayment}
-            disabled={!selectedAmount || loading}
-            className="w-full bg-teal-600 text-white py-3 rounded-full font-semibold shadow-sm hover:bg-teal-700 disabled:opacity-40"
-          >
-            {loading ? 'Processing...' : `Pay ₹${selectedAmount}`}
-          </button>
-        </div>
-
-        {/* Recharge History */}
-        <div className="mt-6">
-          <h2 className="text-teal-700 font-semibold mb-2">Recharge History</h2>
-          {rechargeHistory.length === 0 ? (
-            <p className="text-gray-400 text-center text-xs">No history yet</p>
-          ) : (
-            <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
-              {rechargeHistory.map((rec) => (
-                <div
-                  key={rec.id}
-                  className="bg-white px-4 py-3 rounded-xl shadow flex justify-between"
-                >
-                  <div className="space-y-1">
-                    <p className="text-gray-800 text-sm font-medium">
-                      +₹{rec.addedbalance}
-                    </p>
-                    <p className="text-[10px] text-gray-400">
-                      Prev: ₹{rec.previousbalance} → ₹{rec.balanceleft}
-                    </p>
-                  </div>
-                  <span className="text-[10px] text-gray-400 whitespace-nowrap">
-                    {new Date(rec.createdAt).toLocaleDateString()}<br />
-                    {new Date(rec.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                </div>
-              ))}
+        {/* Main Wallet Card */}
+        <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-teal-600 to-teal-500 px-6 py-6">
+            <div className="flex items-center justify-between text-white">
+              <div>
+                <p className="text-teal-100 text-sm">Your Balance</p>
+                <p className="text-4xl font-bold tracking-tight">₹{balance.toFixed(2)}</p>
+              </div>
+              <div className="bg-white/20 p-3 rounded-full">
+                <FaWallet className="text-2xl" />
+              </div>
             </div>
-          )}
+          </div>
+
+          {/* Recharge Section */}
+          <div className="p-6">
+            <div className="mb-6">
+              <h2 className="text-gray-700 font-semibold mb-3 flex items-center gap-2">
+                <FaRupeeSign className="text-teal-600" />
+                Recharge Amount
+              </h2>
+              <div className="grid grid-cols-4 gap-2 mb-4">
+                {[100, 200, 500, 1000].map(amount => (
+                  <button
+                    key={amount}
+                    onClick={() => setSelectedAmount(amount)}
+                    className={`py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                      selectedAmount === amount
+                        ? 'bg-teal-600 text-white shadow-md scale-95'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    ₹{amount}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={handlePayment}
+                disabled={!selectedAmount || loading}
+                className="w-full bg-gradient-to-r from-teal-600 to-teal-500 text-white py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {loading ? (
+                  <>
+                    <FaSpinner className="animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <FaArrowUp />
+                    Pay ₹{selectedAmount}
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Recharge History */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-gray-700 font-semibold flex items-center gap-2">
+                  <FaHistory className="text-teal-600" />
+                  Recharge History
+                </h2>
+                {totalRecharged > 0 && (
+                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                    Total ₹{totalRecharged.toFixed(2)}
+                  </span>
+                )}
+              </div>
+
+              {isFetchingHistory ? (
+                <div className="flex justify-center py-8">
+                  <FaSpinner className="animate-spin text-teal-600 text-2xl" />
+                </div>
+              ) : rechargeHistory.length === 0 ? (
+                <div className="text-center py-8 bg-gray-50 rounded-xl">
+                  <FaHistory className="mx-auto text-gray-300 text-3xl mb-2" />
+                  <p className="text-gray-400 text-sm">No recharge history yet</p>
+                  <p className="text-gray-400 text-xs mt-1">Your transactions will appear here</p>
+                </div>
+              ) : (
+                <div className="space-y-3 pr-1">
+                  {rechargeHistory.map((rec) => (
+                    <div
+                      key={rec.id}
+                      className="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100"
+                    >
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="text-green-600 font-bold text-lg">+ ₹{rec.addedbalance}</p>
+                          <div className="flex gap-2 mt-1 text-xs text-gray-400">
+                            <span>Prev: ₹{rec.previousbalance}</span>
+                            <span>→</span>
+                            <span>New: ₹{rec.balanceleft}</span>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs text-gray-500">{formatDate(rec.createdAt)}</p>
+                          <p className="text-xs text-gray-400">{formatTime(rec.createdAt)}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useHistory } from 'react-router-dom';
-import { FaHome, FaDownload, FaArrowLeft } from 'react-icons/fa';
+import { FaHome, FaDownload, FaArrowLeft, FaSpinner } from 'react-icons/fa';
 import { format } from 'date-fns';
 import { API_BASE, API_AUTH_KEY } from '../config';
-import { generateBillPDF } from '../../src/utils/pdfGenerator';
+import { generateBillPDF } from '../utils/pdfGenerator';
 
 interface Bill {
   id: string;
@@ -23,6 +23,9 @@ interface Bill {
   associatedadminid: string;
   createdAt: string;
   updatedAt: string;
+  full_address?: string;
+  hubinfo?: { hubname: string };
+  charger_type?: string;
 }
 
 const BillDetail: React.FC = () => {
@@ -31,6 +34,7 @@ const BillDetail: React.FC = () => {
   const [bill, setBill] = useState<Bill | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [pdfGenerating, setPdfGenerating] = useState(false);
 
   useEffect(() => {
     fetchBillDetail();
@@ -51,16 +55,24 @@ const BillDetail: React.FC = () => {
     }
   };
 
-  const handleDownloadPDF = () => {
-    if (bill) {
-      generateBillPDF(bill);
+  const handleDownloadPDF = async () => {
+    if (!bill) return;
+    setPdfGenerating(true);
+    try {
+      await generateBillPDF(bill);
+    } catch (err) {
+      console.error('PDF generation failed:', err);
+      alert('Failed to generate PDF. Please try again.');
+    } finally {
+      setPdfGenerating(false);
     }
   };
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-teal-600">Loading bill details...</p>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
+        <p className="ml-3 text-teal-600">Loading bill details...</p>
       </div>
     );
   }
@@ -82,7 +94,6 @@ const BillDetail: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-r from-teal-100 via-teal-200 to-blue-100 p-6">
       <div className="max-w-2xl mx-auto bg-white bg-opacity-60 backdrop-blur-xl rounded-3xl shadow-2xl p-8">
-        {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <button
             onClick={() => history.push('/bills')}
@@ -100,7 +111,6 @@ const BillDetail: React.FC = () => {
 
         <h1 className="text-3xl font-bold text-teal-800 mb-6">Bill Details</h1>
 
-        {/* Bill Information */}
         <div className="bg-white rounded-lg shadow p-6 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -146,13 +156,23 @@ const BillDetail: React.FC = () => {
           </div>
         </div>
 
-        {/* Download Button */}
         <div className="mt-6 text-center">
           <button
             onClick={handleDownloadPDF}
-            className="bg-teal-500 text-white px-6 py-2 rounded-full flex items-center justify-center space-x-2 mx-auto hover:bg-teal-600 transition"
+            disabled={pdfGenerating}
+            className="bg-teal-500 text-white px-6 py-2 rounded-full flex items-center justify-center space-x-2 mx-auto hover:bg-teal-600 transition disabled:opacity-50"
           >
-            <FaDownload /> <span>Download PDF</span>
+            {pdfGenerating ? (
+              <>
+                <FaSpinner className="animate-spin" />
+                <span>Generating...</span>
+              </>
+            ) : (
+              <>
+                <FaDownload />
+                <span>Download PDF</span>
+              </>
+            )}
           </button>
         </div>
       </div>
