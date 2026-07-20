@@ -19,6 +19,7 @@ import TransactionHistory from './pages/TransactionHistory';
 import MyBookingsList from './pages/MyBookingsList';
 import BillList from './pages/BillList';
 import BillDetail from './pages/BillDetail';
+import ActiveSession from './pages/ActiveSession';
 
 
 const App: React.FC = () => (
@@ -44,6 +45,7 @@ const App: React.FC = () => (
         <Route path="/mybookings" component={MyBookingsList} exact={true} />
         <Route path="/bills" exact component={BillList} />
         <Route path="/bill-detail/:billid" component={BillDetail} />
+        <Route path="/activesession" component={ActiveSession} />
 
 
 

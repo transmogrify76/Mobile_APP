@@ -11,7 +11,7 @@ const QRScannerComponent: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [scanning, setScanning] = useState(true);
 
-  const STATUS_API = "https://api.ocpphal.transev.site/api/status";
+  const STATUS_API = "https://dev-ocpphalapi.transev.site/api/status";
   const OCPP_API_KEY = "J9YtyNYdbLD8N4qMwU2WQrr9XV2SJn4Q3qrCLEcHa8wwaZC34xhAd3RotuYdHwiB";
 
   const getUserId = (): string | null => {
@@ -158,12 +158,11 @@ const QRScannerComponent: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
       {/* Modal */}
       <Modal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        chargerId={scannedData?.uid}
-        connectors={availableConnectors}
-        userid={getUserId()}
-      />
+  isOpen={modalOpen}
+  onClose={() => setModalOpen(false)}
+  chargerId={scannedData?.uid}
+  connectors={availableConnectors}
+/>
     </div>
   );
 };

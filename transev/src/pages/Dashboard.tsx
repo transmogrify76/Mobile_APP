@@ -197,6 +197,15 @@ const Dashboard = () => {
           <button className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition">
             <FaFilter className="text-gray-600" />
           </button>
+          <button
+  onClick={() => history.push('/active-session')}
+  className="p-2 rounded-full bg-teal-100 hover:bg-teal-200 transition ml-2"
+>
+  <FaBolt className="text-teal-600" />
+  <span className="ml-1 text-sm font-medium text-teal-700 hidden sm:inline">Session</span>
+</button>
+
+
         </div>
       </div>
 
