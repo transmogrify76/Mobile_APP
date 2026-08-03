@@ -45,9 +45,7 @@ const App: React.FC = () => (
         <Route path="/mybookings" component={MyBookingsList} exact={true} />
         <Route path="/bills" exact component={BillList} />
         <Route path="/bill-detail/:billid" component={BillDetail} />
-        <Route path="/activesession" component={ActiveSession} />
-
-
+        <Route path="/active-session" component={ActiveSession} />
 
 
 
