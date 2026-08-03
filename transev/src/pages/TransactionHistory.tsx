@@ -6,16 +6,15 @@ import {
   FaHome,
   FaWallet,
   FaRupeeSign,
-  FaBolt,
-  FaReceipt,
   FaSpinner,
   FaArrowLeft,
   FaArrowRight,
   FaDownload,
 } from 'react-icons/fa';
-import { jsPDF } from 'jspdf';
+import { pdf } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 
-// ---------- TypeScript contracts (updated for new bill structure) ----------
+// ---------- Types (unchanged) ----------
 export type MoneyHistoryFilter = 'all' | 'wallet_recharge' | 'charging_debit';
 export type MoneyTransactionType = 'WALLET_RECHARGE' | 'CHARGING_DEBIT';
 export type MoneyTransactionDirection = 'CREDIT' | 'DEBIT';
@@ -98,7 +97,6 @@ export interface ChargingSessionSummary {
   total_cost: string | null;
 }
 
-// The bill field in MoneyTransactionEntry is now ChargingBillData
 export interface MoneyTransactionEntry {
   id: string;
   type: MoneyTransactionType;
@@ -113,7 +111,7 @@ export interface MoneyTransactionEntry {
   created_at: string;
   updated_at: string;
   charging_session: ChargingSessionSummary | null;
-  bill: ChargingBillData | null; // <-- updated
+  bill: ChargingBillData | null;
 }
 
 export interface MoneyHistoryPagination {
@@ -144,7 +142,7 @@ class MoneyHistoryAPIError extends Error {
   }
 }
 
-// ---------- API client (unchanged) ----------
+// ---------- API client ----------
 const CMS_BASE_URL = 'https://be.cms.ocpp.transev.site';
 
 async function getMoneyTransactionHistory({
@@ -207,16 +205,21 @@ const getUserIdFromToken = (): string | null => {
   }
 };
 
-const formatINR = (amount: string | null): string => {
-  if (amount === null || amount.trim() === '') return '₹—';
+// Safe INR formatter – handles null and non‑numeric strings
+const formatINR = (amount: string | null | undefined): string => {
+  if (!amount) return '—';
   const normalized = amount.trim();
-  if (!/^\d+(?:\.\d+)?$/.test(normalized)) return `₹${normalized}`;
+  if (!/^\d+(?:\.\d+)?$/.test(normalized)) return normalized;
   const [whole, fraction = ''] = normalized.split('.');
-  const groupedWhole = new Intl.NumberFormat('en-IN', {
-    maximumFractionDigits: 0,
-  }).format(BigInt(whole));
-  const paise = fraction.padEnd(2, '0').slice(0, 2);
-  return `₹${groupedWhole}.${paise}`;
+  try {
+    const groupedWhole = new Intl.NumberFormat('en-IN', {
+      maximumFractionDigits: 0,
+    }).format(BigInt(whole));
+    const paise = fraction.padEnd(2, '0').slice(0, 2);
+    return `₹${groupedWhole}.${paise}`;
+  } catch {
+    return `₹${normalized}`;
+  }
 };
 
 const transactionTitle = (tx: MoneyTransactionEntry): string => {
@@ -240,174 +243,337 @@ const formatDate = (value: string): string => {
   }).format(date);
 };
 
-// ---------- PDF generation helpers ----------
-function text(value: string | null | undefined): string {
-  return value?.trim() || 'Not available';
-}
+// ---------- PDF styles for @react-pdf/renderer (optimized for one page) ----------
+const pdfStyles = StyleSheet.create({
+  page: {
+    padding: 25, // reduced from 40
+    fontSize: 8, // reduced from 10
+    fontFamily: 'Helvetica',
+    backgroundColor: '#ffffff',
+  },
+  header: {
+    backgroundColor: '#006666',
+    padding: 10, // reduced from 15
+    marginBottom: 12, // reduced from 20
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  headerLeft: {
+    color: '#ffffff',
+  },
+  companyName: {
+    fontSize: 18, // reduced from 22
+    fontWeight: 'bold',
+    color: '#ffffff',
+  },
+  companyTagline: {
+    fontSize: 8, // reduced from 9
+    color: '#e0e0e0',
+  },
+  headerRight: {
+    alignItems: 'flex-end',
+  },
+  invoiceTitle: {
+    fontSize: 12, // reduced from 14
+    fontWeight: 'bold',
+    color: '#ffffff',
+  },
+  invoiceNumber: {
+    fontSize: 8, // reduced from 9
+    color: '#ffffff',
+  },
+  sectionTitle: {
+    fontSize: 10, // reduced from 12
+    fontWeight: 'bold',
+    marginTop: 6, // reduced from 12
+    marginBottom: 4, // reduced from 6
+    backgroundColor: '#006666',
+    color: '#ffffff',
+    padding: 3,
+    paddingLeft: 6,
+  },
+  row: {
+    flexDirection: 'row',
+    borderBottomWidth: 0.5, // thinner border
+    borderBottomColor: '#eeeeee',
+    paddingVertical: 2, // reduced from 3
+  },
+  label: {
+    width: '30%',
+    fontWeight: 'bold',
+  },
+  value: {
+    width: '70%',
+  },
+  table: {
+    marginTop: 4, // reduced from 6
+    marginBottom: 6, // reduced from 12
+  },
+  amountRow: {
+    flexDirection: 'row',
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#dddddd',
+    paddingVertical: 2, // reduced from 4
+  },
+  amountLabel: {
+    width: '40%',
+    fontWeight: 'bold',
+  },
+  amountValue: {
+    width: '60%',
+    textAlign: 'right',
+  },
+  footer: {
+    marginTop: 15, // reduced from 30
+    fontSize: 7, // reduced from 8
+    color: '#888888',
+    textAlign: 'center',
+    borderTopWidth: 0.5,
+    borderTopColor: '#cccccc',
+    paddingTop: 6, // reduced from 10
+  },
+});
 
-function money(value: string | null | undefined, currency = 'INR'): string {
-  if (!value) return 'Not available';
-  return currency === 'INR' ? `₹${value}` : `${currency} ${value}`;
-}
+// ---------- PDF Document Component ----------
+const InvoicePDF = ({ bill }: { bill: ChargingBillData }) => {
+  const textOrDash = (value: string | null | undefined): string =>
+    value?.trim() || '—';
 
-function dateTime(value: string | null | undefined): string {
-  if (!value) return 'Not available';
-  const parsed = new Date(value);
-  if (isNaN(parsed.getTime())) return value;
-  return new Intl.DateTimeFormat('en-IN', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(parsed);
-}
-
-function duration(milliseconds: string | null | undefined): string {
-  if (!milliseconds) return 'Not available';
-  const totalMilliseconds = Number(milliseconds);
-  if (!isFinite(totalMilliseconds) || totalMilliseconds < 0) {
-    return milliseconds;
-  }
-  const totalMinutes = Math.floor(totalMilliseconds / 60_000);
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-  return `${hours}h ${minutes}m`;
-}
-
-function safeFilename(value: string): string {
-  return value.replace(/[^a-zA-Z0-9._-]/g, '_');
-}
-
-// ---------- PDF generator (from spec) ----------
-function generateChargingBillPDF(bill: ChargingBillData): void {
-  const pdf = new jsPDF({
-    orientation: 'portrait',
-    unit: 'mm',
-    format: 'a4',
-  });
-  const left = 18;
-  const right = 192;
-  let y = 20;
-
-  const line = (label: string, value: string | null | undefined) => {
-    pdf.setFont('helvetica', 'bold');
-    pdf.text(`${label}:`, left, y);
-    pdf.setFont('helvetica', 'normal');
-    pdf.text(text(value), 65, y);
-    y += 7;
+  const formatDateTime = (value: string | null | undefined): string => {
+    if (!value) return '—';
+    const d = new Date(value);
+    if (isNaN(d.getTime())) return value;
+    return new Intl.DateTimeFormat('en-IN', {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    }).format(d);
   };
 
-  const section = (title: string) => {
-    y += 4;
-    pdf.setFont('helvetica', 'bold');
-    pdf.setFontSize(13);
-    pdf.text(title, left, y);
-    y += 3;
-    pdf.line(left, y, right, y);
-    y += 7;
-    pdf.setFontSize(10);
+  const formatDuration = (ms: string | null | undefined): string => {
+    if (!ms) return '—';
+    const totalMs = Number(ms);
+    if (!isFinite(totalMs) || totalMs < 0) return ms;
+    const totalMinutes = Math.floor(totalMs / 60_000);
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return `${hours}h ${minutes}m`;
   };
 
-  pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(18);
-  pdf.text(bill.title || 'Customer Bill', 105, y, { align: 'center' });
-  y += 12;
-  pdf.setFontSize(10);
+  return (
+    <Document>
+      <Page size="A4" style={pdfStyles.page}>
+        {/* Header */}
+        <View style={pdfStyles.header}>
+          <View style={pdfStyles.headerLeft}>
+            <Text style={pdfStyles.companyName}>TransEV</Text>
+            <Text style={pdfStyles.companyTagline}>Electric Vehicle Charging Network</Text>
+          </View>
+          <View style={pdfStyles.headerRight}>
+            <Text style={pdfStyles.invoiceTitle}>INVOICE</Text>
+            <Text style={pdfStyles.invoiceNumber}>#{textOrDash(bill.invoice_number)}</Text>
+            <Text style={pdfStyles.invoiceNumber}>Date: {formatDateTime(bill.issued_at)}</Text>
+          </View>
+        </View>
 
-  line('Invoice Number', bill.invoice_number);
-  line('Issue Date', dateTime(bill.issued_at));
-  line('Currency', bill.currency);
-  line('Billing Source', bill.source);
+        {/* Customer */}
+        <Text style={pdfStyles.sectionTitle}>BILL TO</Text>
+        <View style={pdfStyles.table}>
+          <View style={pdfStyles.row}>
+            <Text style={pdfStyles.label}>Name</Text>
+            <Text style={pdfStyles.value}>{textOrDash(bill.customer.name)}</Text>
+          </View>
+          <View style={pdfStyles.row}>
+            <Text style={pdfStyles.label}>Customer ID</Text>
+            <Text style={pdfStyles.value}>{textOrDash(bill.customer.id)}</Text>
+          </View>
+          <View style={pdfStyles.row}>
+            <Text style={pdfStyles.label}>Email</Text>
+            <Text style={pdfStyles.value}>{textOrDash(bill.customer.email)}</Text>
+          </View>
+          <View style={pdfStyles.row}>
+            <Text style={pdfStyles.label}>Phone</Text>
+            <Text style={pdfStyles.value}>{textOrDash(bill.customer.phone)}</Text>
+          </View>
+          <View style={pdfStyles.row}>
+            <Text style={pdfStyles.label}>Address</Text>
+            <Text style={pdfStyles.value}>{textOrDash(bill.customer.address)}</Text>
+          </View>
+        </View>
 
-  section('Customer');
-  line('Customer Name', bill.customer.name);
-  line('Customer ID', bill.customer.id);
-  line('Email', bill.customer.email);
-  line('Phone', bill.customer.phone);
-  if (bill.customer.address) {
-    line('Address', bill.customer.address);
+        {/* Operator (if exists) */}
+        {bill.issuer && (
+          <>
+            <Text style={pdfStyles.sectionTitle}>CHARGING OPERATOR</Text>
+            <View style={pdfStyles.table}>
+              <View style={pdfStyles.row}>
+                <Text style={pdfStyles.label}>Name</Text>
+                <Text style={pdfStyles.value}>{textOrDash(bill.issuer.name)}</Text>
+              </View>
+              <View style={pdfStyles.row}>
+                <Text style={pdfStyles.label}>Email</Text>
+                <Text style={pdfStyles.value}>{textOrDash(bill.issuer.email)}</Text>
+              </View>
+              <View style={pdfStyles.row}>
+                <Text style={pdfStyles.label}>Phone</Text>
+                <Text style={pdfStyles.value}>{textOrDash(bill.issuer.phone)}</Text>
+              </View>
+              <View style={pdfStyles.row}>
+                <Text style={pdfStyles.label}>Address</Text>
+                <Text style={pdfStyles.value}>{textOrDash(bill.issuer.address)}</Text>
+              </View>
+              <View style={pdfStyles.row}>
+                <Text style={pdfStyles.label}>GSTIN</Text>
+                <Text style={pdfStyles.value}>{textOrDash(bill.issuer.gstin)}</Text>
+              </View>
+            </View>
+          </>
+        )}
+
+        {/* Charging Session Details */}
+        <Text style={pdfStyles.sectionTitle}>CHARGING SESSION DETAILS</Text>
+        <View style={pdfStyles.table}>
+          <View style={pdfStyles.row}>
+            <Text style={pdfStyles.label}>Session ID</Text>
+            <Text style={pdfStyles.value}>{textOrDash(bill.charging.session_id)}</Text>
+          </View>
+          <View style={pdfStyles.row}>
+            <Text style={pdfStyles.label}>Charger Name</Text>
+            <Text style={pdfStyles.value}>{textOrDash(bill.charger.name)}</Text>
+          </View>
+          <View style={pdfStyles.row}>
+            <Text style={pdfStyles.label}>Charger ID</Text>
+            <Text style={pdfStyles.value}>{textOrDash(bill.charger.id)}</Text>
+          </View>
+          <View style={pdfStyles.row}>
+            <Text style={pdfStyles.label}>Serial Number</Text>
+            <Text style={pdfStyles.value}>{textOrDash(bill.charger.serial_number)}</Text>
+          </View>
+          <View style={pdfStyles.row}>
+            <Text style={pdfStyles.label}>Location</Text>
+            <Text style={pdfStyles.value}>{textOrDash(bill.charger.address)}</Text>
+          </View>
+          <View style={pdfStyles.row}>
+            <Text style={pdfStyles.label}>Connector Type</Text>
+            <Text style={pdfStyles.value}>{textOrDash(bill.charger.connector_type)}</Text>
+          </View>
+          {/* Protocol omitted to save space – uncomment if needed */}
+          {/*
+          <View style={pdfStyles.row}>
+            <Text style={pdfStyles.label}>Protocol</Text>
+            <Text style={pdfStyles.value}>{textOrDash(bill.charger.protocol)}</Text>
+          </View>
+          */}
+          <View style={pdfStyles.row}>
+            <Text style={pdfStyles.label}>Started At</Text>
+            <Text style={pdfStyles.value}>{formatDateTime(bill.charging.started_at)}</Text>
+          </View>
+          <View style={pdfStyles.row}>
+            <Text style={pdfStyles.label}>Stopped At</Text>
+            <Text style={pdfStyles.value}>{formatDateTime(bill.charging.stopped_at)}</Text>
+          </View>
+          <View style={pdfStyles.row}>
+            <Text style={pdfStyles.label}>Duration</Text>
+            <Text style={pdfStyles.value}>{formatDuration(bill.charging.duration_ms)}</Text>
+          </View>
+          <View style={pdfStyles.row}>
+            <Text style={pdfStyles.label}>Meter Start (Wh)</Text>
+            <Text style={pdfStyles.value}>{textOrDash(bill.charging.meter_start_wh)}</Text>
+          </View>
+          <View style={pdfStyles.row}>
+            <Text style={pdfStyles.label}>Meter Stop (Wh)</Text>
+            <Text style={pdfStyles.value}>{textOrDash(bill.charging.meter_stop_wh)}</Text>
+          </View>
+          <View style={pdfStyles.row}>
+            <Text style={pdfStyles.label}>Energy Consumed (kWh)</Text>
+            <Text style={pdfStyles.value}>{textOrDash(bill.charging.energy_consumed_kwh)}</Text>
+          </View>
+        </View>
+
+        {/* Payment Reference */}
+        <Text style={pdfStyles.sectionTitle}>PAYMENT REFERENCE</Text>
+        <View style={pdfStyles.table}>
+          <View style={pdfStyles.row}>
+            <Text style={pdfStyles.label}>Reference</Text>
+            <Text style={pdfStyles.value}>{textOrDash(bill.payment.reference)}</Text>
+          </View>
+          <View style={pdfStyles.row}>
+            <Text style={pdfStyles.label}>Wallet ID</Text>
+            <Text style={pdfStyles.value}>{textOrDash(bill.payment.wallet_id)}</Text>
+          </View>
+        </View>
+
+        {/* Amount Breakdown */}
+        <Text style={pdfStyles.sectionTitle}>AMOUNT BREAKDOWN</Text>
+        <View style={pdfStyles.table}>
+          <View style={pdfStyles.amountRow}>
+            <Text style={pdfStyles.amountLabel}>Taxable Amount</Text>
+            <Text style={pdfStyles.amountValue}>{formatINR(bill.amounts.taxable)}</Text>
+          </View>
+          <View style={pdfStyles.amountRow}>
+            <Text style={pdfStyles.amountLabel}>GST</Text>
+            <Text style={pdfStyles.amountValue}>{formatINR(bill.amounts.gst)}</Text>
+          </View>
+          <View style={pdfStyles.amountRow}>
+            <Text style={pdfStyles.amountLabel}>Total Amount</Text>
+            <Text style={pdfStyles.amountValue}>{formatINR(bill.amounts.total)}</Text>
+          </View>
+          <View style={pdfStyles.amountRow}>
+            <Text style={pdfStyles.amountLabel}>Wallet Deduction</Text>
+            <Text style={pdfStyles.amountValue}>{formatINR(bill.amounts.balance_deducted)}</Text>
+          </View>
+        </View>
+
+        {/* Footer */}
+        <Text style={pdfStyles.footer}>
+          This document was generated electronically. It is a valid record of the charging transaction.
+          {'\n'}Invoice #{textOrDash(bill.invoice_number)} · Generated on{' '}
+          {new Date().toLocaleDateString('en-IN', { dateStyle: 'medium' })}
+        </Text>
+      </Page>
+    </Document>
+  );
+};
+
+// ---------- Generate PDF using @react-pdf/renderer ----------
+async function generateChargingBillPDF(bill: ChargingBillData): Promise<void> {
+  console.log('📄 Generating PDF with @react-pdf/renderer:', bill);
+  if (!bill) throw new Error('Bill data is null or undefined');
+
+  try {
+    // Render the PDF document to a blob
+    const blob = await pdf(<InvoicePDF bill={bill} />).toBlob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    const safeName = (bill.invoice_number || 'bill').replace(/[^a-zA-Z0-9._-]/g, '_');
+    link.download = `invoice_${safeName}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    console.log('✅ PDF saved successfully');
+  } catch (error) {
+    console.error('❌ Error generating PDF:', error);
+    throw error;
   }
-
-  if (bill.issuer) {
-    section('Charging Operator');
-    line('Operator Name', bill.issuer.name);
-    line('Email', bill.issuer.email);
-    line('Phone', bill.issuer.phone);
-    line('Address', bill.issuer.address);
-    if (bill.issuer.gstin) {
-      line('GSTIN', bill.issuer.gstin);
-    }
-  }
-
-  section('Charging Details');
-  line('Session ID', bill.charging.session_id);
-  line('Charger', bill.charger.name);
-  line('Charger ID', bill.charger.id);
-  line('Serial Number', bill.charger.serial_number);
-  line('Location', bill.charger.address);
-  line('Connector Type', bill.charger.connector_type);
-  line('Protocol', bill.charger.protocol);
-  line('Charging Started', dateTime(bill.charging.started_at));
-  line('Charging Stopped', dateTime(bill.charging.stopped_at));
-  line('Duration', duration(bill.charging.duration_ms));
-  line(
-    'Meter Start',
-    bill.charging.meter_start_wh ? `${bill.charging.meter_start_wh} Wh` : null,
-  );
-  line(
-    'Meter Stop',
-    bill.charging.meter_stop_wh ? `${bill.charging.meter_stop_wh} Wh` : null,
-  );
-  line(
-    'Energy Consumed',
-    bill.charging.energy_consumed_kwh
-      ? `${bill.charging.energy_consumed_kwh} kWh`
-      : null,
-  );
-
-  section('Payment');
-  line('Reference', bill.payment.reference);
-  line('Wallet ID', bill.payment.wallet_id);
-
-  section('Amount Breakdown');
-  line('Taxable Amount', money(bill.amounts.taxable, bill.currency));
-  line('GST', money(bill.amounts.gst, bill.currency));
-  line('Total Amount', money(bill.amounts.total, bill.currency));
-  line('Wallet Deduction', money(bill.amounts.balance_deducted, bill.currency));
-
-  y += 8;
-  pdf.setFont('helvetica', 'normal');
-  pdf.setFontSize(8);
-  pdf.text(
-    'This document was generated electronically from the charging transaction record.',
-    105,
-    y,
-    { align: 'center' },
-  );
-
-  const filename = safeFilename(`bill_${bill.invoice_number}.pdf`);
-  pdf.save(filename);
 }
 
-// ---------- Component ----------
+// ---------- Main Component (unchanged) ----------
 const TransactionHistory: React.FC = () => {
   const history = useHistory();
   const token = localStorage.getItem('token') || '';
   const userid = getUserIdFromToken();
 
-  // State
   const [response, setResponse] = useState<MoneyHistoryResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [unauthorized, setUnauthorized] = useState(false);
-
-  // Pagination & filter
   const [page, setPage] = useState(1);
   const [limit] = useState(20);
   const [filter, setFilter] = useState<MoneyHistoryFilter>('all');
-
-  // For bill download loading (only for UI feedback)
   const [downloadingBillId, setDownloadingBillId] = useState<string | null>(null);
 
-  // Fetch function
   const fetchData = useCallback(
     async (abortSignal?: AbortSignal) => {
       if (!token) {
@@ -449,7 +615,6 @@ const TransactionHistory: React.FC = () => {
     return () => controller.abort();
   }, [fetchData]);
 
-  // Handle filter change (reset to page 1)
   const handleFilterChange = (newFilter: MoneyHistoryFilter) => {
     if (newFilter !== filter) {
       setFilter(newFilter);
@@ -457,27 +622,31 @@ const TransactionHistory: React.FC = () => {
     }
   };
 
-  // Pagination controls
   const goToPage = (newPage: number) => {
     if (newPage >= 1 && response?.pagination && newPage <= response.pagination.total_pages) {
       setPage(newPage);
     }
   };
 
-  // Updated download function – uses local PDF generation
-  const downloadBill = (bill: ChargingBillData) => {
+  const downloadBill = async (bill: ChargingBillData) => {
+    console.log('🔽 Download button clicked for bill:', bill);
+    if (!bill) {
+      toast.error('No bill data available');
+      return;
+    }
+
     setDownloadingBillId(bill.id);
     try {
-      generateChargingBillPDF(bill);
-      toast.success('Bill generated and downloaded');
-    } catch (err) {
-      toast.error('Could not generate bill');
+      await generateChargingBillPDF(bill);
+      toast.success('Bill downloaded successfully');
+    } catch (err: any) {
+      console.error('❌ Download failed:', err);
+      toast.error(`Could not generate bill: ${err.message || 'Unknown error'}`);
     } finally {
       setDownloadingBillId(null);
     }
   };
 
-  // If unauthorized, redirect to login
   useEffect(() => {
     if (unauthorized) {
       localStorage.removeItem('token');
@@ -485,7 +654,7 @@ const TransactionHistory: React.FC = () => {
     }
   }, [unauthorized, history]);
 
-  // ----- Render -----
+  // ----- Render (unchanged) -----
   const renderTransactionCard = (tx: MoneyTransactionEntry) => {
     const sign = transactionSign(tx);
     const amount = formatINR(tx.amount);
@@ -549,10 +718,12 @@ const TransactionHistory: React.FC = () => {
                 )}
               </div>
             )}
-            {/* Bill download button – now uses local generation */}
             {tx.type === 'CHARGING_DEBIT' && tx.bill && (
               <button
-                onClick={() => downloadBill(tx.bill!)}
+                onClick={() => {
+                  console.log('👆 User clicked Download Bill for transaction:', tx.id);
+                  downloadBill(tx.bill!);
+                }}
                 disabled={downloadingBillId === tx.bill.id}
                 className="mt-2 text-xs bg-teal-600 hover:bg-teal-700 text-white px-3 py-1 rounded-full flex items-center gap-1 transition disabled:opacity-50"
               >
@@ -603,7 +774,6 @@ const TransactionHistory: React.FC = () => {
   return (
     <div className="h-screen overflow-y-auto bg-gradient-to-br from-teal-50 via-white to-blue-50 p-4">
       <div className="max-w-md mx-auto pb-4">
-        {/* Home button */}
         <div className="mb-4">
           <button
             onClick={() => history.push('/dashboard')}
@@ -613,9 +783,7 @@ const TransactionHistory: React.FC = () => {
           </button>
         </div>
 
-        {/* Main card */}
         <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl overflow-hidden">
-          {/* Header – Balance */}
           <div className="bg-gradient-to-r from-teal-600 to-teal-500 px-6 py-6">
             <div className="flex items-center justify-between text-white">
               <div>
@@ -628,9 +796,7 @@ const TransactionHistory: React.FC = () => {
             </div>
           </div>
 
-          {/* Content */}
           <div className="p-6">
-            {/* Filter tabs */}
             <div className="flex bg-gray-100 rounded-full p-1 mb-6">
               {(['all', 'wallet_recharge', 'charging_debit'] as const).map((type) => (
                 <button
@@ -647,7 +813,6 @@ const TransactionHistory: React.FC = () => {
               ))}
             </div>
 
-            {/* Transactions list */}
             {transactions.length === 0 ? (
               <div className="text-center py-8">
                 <FaRupeeSign className="mx-auto text-4xl text-gray-300 mb-3" />
@@ -657,8 +822,6 @@ const TransactionHistory: React.FC = () => {
             ) : (
               <>
                 {transactions.map((tx) => renderTransactionCard(tx))}
-
-                {/* Pagination controls */}
                 {pagination && pagination.total_pages > 1 && (
                   <div className="flex items-center justify-between mt-4">
                     <button

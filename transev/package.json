@@ -23,6 +23,7 @@
     "@capacitor/storage": "^1.2.5",
     "@ionic/react": "^8.0.0",
     "@ionic/react-router": "^8.0.0",
+    "@react-pdf/renderer": "^4.5.1",
     "@types/react-router": "^5.1.20",
     "@types/react-router-dom": "^5.3.3",
     "axios": "^1.7.7",
