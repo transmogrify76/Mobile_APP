@@ -106,40 +106,66 @@ const Wallet: React.FC = () => {
         body: JSON.stringify({ userid, walletid, price: selectedAmount.toString() }),
       });
 
-      const { orderId, actualprice } = await res.json();
+      const data = await res.json();
+      console.log('Backend response from initwalletrecharge:', data);
+
+      const { orderId, actualprice } = data;
+      
+      // 🔍 Debug: log what the backend returned
+      console.log(`Selected amount: ₹${selectedAmount}, Backend actualprice: ${actualprice}`);
+
+      // 🛠️ WORKAROUND: Use the selected amount directly because backend returns wrong actualprice.
+      // The correct fix is to fix the backend endpoint to return the correct amount.
+      // We'll use selectedAmount for the Razorpay amount, but the orderId might still be tied to the wrong amount.
+      // If payment verification fails, the backend must be corrected.
+      const razorpayAmount = selectedAmount * 100; // in paise
 
       const rzp = new window.Razorpay({
         key: razorpayKey,
-        amount: actualprice * 100,
+        amount: razorpayAmount,
         currency: 'INR',
         name: 'TransEV',
         description: 'Wallet Recharge',
         image: 'https://transev.in/assets/up-B0GM0qzi.png',
         order_id: orderId,
         handler: async (response: any) => {
-          await fetch(`${rooturi}/admin/verifypayment`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              apiauthkey: apikey,
-            },
-            body: JSON.stringify({
-              razorpay_payment_id: response.razorpay_payment_id,
-              userid,
-              walletid,
-              price: actualprice.toString(),
-            }),
-          });
-
-          toast.success('Recharge successful!');
-          fetchBalance();
-          fetchRechargeHistory();
+          try {
+            const verifyRes = await fetch(`${rooturi}/admin/verifypayment`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                apiauthkey: apikey,
+              },
+              body: JSON.stringify({
+                razorpay_payment_id: response.razorpay_payment_id,
+                userid,
+                walletid,
+                price: selectedAmount.toString(), // send the correct amount
+              }),
+            });
+            const verifyData = await verifyRes.json();
+            if (verifyRes.ok) {
+              toast.success('Recharge successful!');
+              fetchBalance();
+              fetchRechargeHistory();
+            } else {
+              toast.error(verifyData.message || 'Verification failed. Please contact support.');
+            }
+          } catch (err) {
+            toast.error('Verification error. Please contact support.');
+          }
         },
         theme: { color: '#0f766e' },
+        modal: {
+          ondismiss: () => {
+            toast.info('Payment cancelled');
+          }
+        }
       });
 
       rzp.open();
     } catch (err: any) {
+      console.error('Payment initiation error:', err);
       toast.error('Recharge failed. Please try again.');
     } finally {
       setLoading(false);
@@ -162,10 +188,8 @@ const Wallet: React.FC = () => {
   );
 
   return (
-    // Force scrollable container: full viewport height, vertical scroll
     <div className="h-screen overflow-y-auto bg-gradient-to-br from-teal-50 via-white to-blue-50 p-4">
       <div className="max-w-md mx-auto pb-4">
-        {/* Home Button */}
         <div className="mb-4">
           <button
             onClick={() => history.push('/dashboard')}
@@ -175,9 +199,7 @@ const Wallet: React.FC = () => {
           </button>
         </div>
 
-        {/* Main Wallet Card */}
         <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl overflow-hidden">
-          {/* Header */}
           <div className="bg-gradient-to-r from-teal-600 to-teal-500 px-6 py-6">
             <div className="flex items-center justify-between text-white">
               <div>
@@ -190,7 +212,6 @@ const Wallet: React.FC = () => {
             </div>
           </div>
 
-          {/* Recharge Section */}
           <div className="p-6">
             <div className="mb-6">
               <h2 className="text-gray-700 font-semibold mb-3 flex items-center gap-2">
@@ -231,7 +252,6 @@ const Wallet: React.FC = () => {
               </button>
             </div>
 
-            {/* Recharge History */}
             <div>
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-gray-700 font-semibold flex items-center gap-2">
